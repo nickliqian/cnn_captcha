@@ -102,3 +102,10 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# pycharm
+.idea/
+
+# 数据文件
+sample/
+model/

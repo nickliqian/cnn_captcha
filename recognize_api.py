@@ -1,0 +1,69 @@
+# -*- coding: UTF-8 -*-
+"""
+构建flask接口服务
+接收 files={'image_file': ('captcha.jpg', BytesIO(bytes), 'application')} 参数识别验证码
+需要配置参数：
+    image_height = 40
+    image_width = 80
+    max_captcha = 4
+"""
+import json
+from io import BytesIO
+import os
+from recognition_object import Recognizer
+
+import time
+from flask import Flask, request, jsonify, Response
+from PIL import Image
+
+os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+
+# 需要配置参数
+image_height = 40
+image_width = 80
+max_captcha = 4
+
+app = Flask(__name__)
+basedir = os.path.abspath(os.path.dirname(__file__))
+
+# 生成识别对象，需要配置参数
+R = Recognizer(image_height, image_width, max_captcha)
+
+
+def response_headers(content):
+    resp = Response(content)
+    resp.headers['Access-Control-Allow-Origin'] = '*'
+    return resp
+
+
+@app.route('/b', methods=['POST'])
+def up_image():
+    if request.method == 'POST' and request.files.get('image_file'):
+        timec = str(time.time()).replace(".", "")
+        file = request.files.get('image_file')
+        img = file.read()
+        img = BytesIO(img)
+        img = Image.open(img, mode="r")
+        # username = request.form.get("name")
+        print("接收图片尺寸: {}".format(img.size))
+        value = R.rec_image(img)
+        print("识别结果: {}".format(value))
+        # 保存图片
+        path = basedir + "/sample/api/"  # 接收
+        file_name = "{}_{}.jpg".format(value, timec)
+        file_path = os.path.join(path + file_name)
+        img.save(file_path)
+        result = {
+            'time': timec,
+            'value': value,
+        }
+        return jsonify(result)
+    else:
+        content = json.dumps({"error_code": "1001"})
+        resp = response_headers(content)
+        return resp
+
+
+if __name__ == '__main__':
+    app.run(debug=True, port=6000)
