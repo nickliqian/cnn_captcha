@@ -14,7 +14,7 @@ from sample import sample_conf
 
 
 class Recognizer(object):
-    def __init__(self, image_height, image_width, max_captcha, char_set):
+    def __init__(self, image_height, image_width, max_captcha, char_set, model_save_dir):
         self.w_alpha = 0.01
         self.b_alpha = 0.1
         self.image_height = image_height
@@ -22,6 +22,7 @@ class Recognizer(object):
         self.max_captcha = max_captcha
         self.char_set = char_set
         self.char_set_len = len(self.char_set)
+        self.model_save_dir = model_save_dir
         # tf初始化占位符
         self.X = tf.placeholder(tf.float32, [None, self.image_height * self.image_width])  # 特征向量
         self.Y = tf.placeholder(tf.float32, [None, self.max_captcha * self.char_set_len])  # 标签
@@ -30,7 +31,7 @@ class Recognizer(object):
         self.sess = tf.Session()
         self.y_predict = self.model()
         saver = tf.train.Saver()
-        saver.restore(self.sess, "model/")
+        saver.restore(self.sess, self.model_save_dir)
 
     def __del__(self):
         self.sess.close()
@@ -74,7 +75,6 @@ class Recognizer(object):
         # 卷积层1
         wc1 = tf.get_variable(name='wc1', shape=[3, 3, 1, 32], dtype=tf.float32,
                               initializer=tf.contrib.layers.xavier_initializer())
-        # wc1 = tf.Variable(w_alpha * tf.random_normal([3, 3, 1, 32]))
         bc1 = tf.Variable(self.b_alpha * tf.random_normal([32]))
         conv1 = tf.nn.relu(tf.nn.bias_add(tf.nn.conv2d(x, wc1, strides=[1, 1, 1, 1], padding='SAME'), bc1))
         conv1 = tf.nn.max_pool(conv1, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
@@ -83,7 +83,6 @@ class Recognizer(object):
         # 卷积层2
         wc2 = tf.get_variable(name='wc2', shape=[3, 3, 32, 64], dtype=tf.float32,
                               initializer=tf.contrib.layers.xavier_initializer())
-        # wc2 = tf.Variable(w_alpha * tf.random_normal([3, 3, 32, 64]))
         bc2 = tf.Variable(self.b_alpha * tf.random_normal([64]))
         conv2 = tf.nn.relu(tf.nn.bias_add(tf.nn.conv2d(conv1, wc2, strides=[1, 1, 1, 1], padding='SAME'), bc2))
         conv2 = tf.nn.max_pool(conv2, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
@@ -92,7 +91,6 @@ class Recognizer(object):
         # 卷积层3
         wc3 = tf.get_variable(name='wc3', shape=[3, 3, 64, 128], dtype=tf.float32,
                               initializer=tf.contrib.layers.xavier_initializer())
-        # wc3 = tf.Variable(w_alpha * tf.random_normal([3, 3, 64, 128]))
         bc3 = tf.Variable(self.b_alpha * tf.random_normal([128]))
         conv3 = tf.nn.relu(tf.nn.bias_add(tf.nn.conv2d(conv2, wc3, strides=[1, 1, 1, 1], padding='SAME'), bc3))
         conv3 = tf.nn.max_pool(conv3, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
@@ -103,7 +101,6 @@ class Recognizer(object):
         # 全连接层1
         wd1 = tf.get_variable(name='wd1', shape=[next_shape, 1024], dtype=tf.float32,
                               initializer=tf.contrib.layers.xavier_initializer())
-        # wd1 = tf.Variable(w_alpha * tf.random_normal([7*20*128,1024]))
         bd1 = tf.Variable(self.b_alpha * tf.random_normal([1024]))
         dense = tf.reshape(conv3, [-1, wd1.get_shape().as_list()[0]])
         dense = tf.nn.relu(tf.add(tf.matmul(dense, wd1), bd1))
@@ -112,7 +109,6 @@ class Recognizer(object):
         # 全连接层2
         wout = tf.get_variable('name', shape=[1024, self.max_captcha * self.char_set_len], dtype=tf.float32,
                                initializer=tf.contrib.layers.xavier_initializer())
-        # wout = tf.Variable(w_alpha * tf.random_normal([1024, max_captcha * char_set_len]))
         bout = tf.Variable(self.b_alpha * tf.random_normal([self.max_captcha * self.char_set_len]))
         y_predict = tf.add(tf.matmul(dense, wout), bout)
         return y_predict
@@ -138,7 +134,8 @@ def main():
     image_width = sample_conf["image_width"]
     max_captcha = sample_conf["max_captcha"]
     char_set = sample_conf["char_set"]
-    R = Recognizer(image_height, image_width, max_captcha, char_set)
+    model_save_dir = sample_conf["model_save_dir"]
+    R = Recognizer(image_height, image_width, max_captcha, char_set, model_save_dir)
     r_img = Image.open("./sample/test/2b3n_6915e26c67a52bc0e4e13d216eb62b37.jpg")
     t = R.rec_image(r_img)
     print(t)

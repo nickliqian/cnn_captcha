@@ -25,14 +25,16 @@ image_height = sample_conf["image_height"]
 image_width = sample_conf["image_width"]
 max_captcha = sample_conf["max_captcha"]
 api_image_dir = sample_conf["api_image_dir"]
+model_save_dir = sample_conf["model_save_dir"]
 image_suffix = sample_conf["image_suffix"]  # 文件后缀
+char_set = sample_conf["char_set"]
 
 # Flask对象
 app = Flask(__name__)
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 # 生成识别对象，需要配置参数
-R = Recognizer(image_height, image_width, max_captcha)
+R = Recognizer(image_height, image_width, max_captcha, char_set, model_save_dir)
 
 
 def response_headers(content):

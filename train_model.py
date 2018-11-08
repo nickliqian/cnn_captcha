@@ -14,8 +14,9 @@ from sample import sample_conf
 
 
 class TrainModel(object):
-
-    def __init__(self, img_path, char_set):
+    def __init__(self, img_path, char_set, model_save_dir):
+        # 模型路径
+        self.model_save_dir = model_save_dir
         # 打乱文件顺序
         self.img_path = img_path
         self.img_list = os.listdir(img_path)
@@ -126,7 +127,6 @@ class TrainModel(object):
         # 卷积层1
         wc1 = tf.get_variable(name='wc1', shape=[3, 3, 1, 32], dtype=tf.float32,
                               initializer=tf.contrib.layers.xavier_initializer())
-        # wc1 = tf.Variable(w_alpha * tf.random_normal([3, 3, 1, 32]))
         bc1 = tf.Variable(self.b_alpha * tf.random_normal([32]))
         conv1 = tf.nn.relu(tf.nn.bias_add(tf.nn.conv2d(x, wc1, strides=[1, 1, 1, 1], padding='SAME'), bc1))
         conv1 = tf.nn.max_pool(conv1, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
@@ -135,7 +135,6 @@ class TrainModel(object):
         # 卷积层2
         wc2 = tf.get_variable(name='wc2', shape=[3, 3, 32, 64], dtype=tf.float32,
                               initializer=tf.contrib.layers.xavier_initializer())
-        # wc2 = tf.Variable(w_alpha * tf.random_normal([3, 3, 32, 64]))
         bc2 = tf.Variable(self.b_alpha * tf.random_normal([64]))
         conv2 = tf.nn.relu(tf.nn.bias_add(tf.nn.conv2d(conv1, wc2, strides=[1, 1, 1, 1], padding='SAME'), bc2))
         conv2 = tf.nn.max_pool(conv2, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
@@ -144,7 +143,6 @@ class TrainModel(object):
         # 卷积层3
         wc3 = tf.get_variable(name='wc3', shape=[3, 3, 64, 128], dtype=tf.float32,
                               initializer=tf.contrib.layers.xavier_initializer())
-        # wc3 = tf.Variable(w_alpha * tf.random_normal([3, 3, 64, 128]))
         bc3 = tf.Variable(self.b_alpha * tf.random_normal([128]))
         conv3 = tf.nn.relu(tf.nn.bias_add(tf.nn.conv2d(conv2, wc3, strides=[1, 1, 1, 1], padding='SAME'), bc3))
         conv3 = tf.nn.max_pool(conv3, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
@@ -155,7 +153,6 @@ class TrainModel(object):
         # 全连接层1
         wd1 = tf.get_variable(name='wd1', shape=[next_shape, 1024], dtype=tf.float32,
                               initializer=tf.contrib.layers.xavier_initializer())
-        # wd1 = tf.Variable(w_alpha * tf.random_normal([7*20*128,1024]))
         bd1 = tf.Variable(self.b_alpha * tf.random_normal([1024]))
         dense = tf.reshape(conv3, [-1, wd1.get_shape().as_list()[0]])
         dense = tf.nn.relu(tf.add(tf.matmul(dense, wd1), bd1))
@@ -164,7 +161,6 @@ class TrainModel(object):
         # 全连接层2
         wout = tf.get_variable('name', shape=[1024, self.max_captcha * self.char_set_len], dtype=tf.float32,
                                initializer=tf.contrib.layers.xavier_initializer())
-        # wout = tf.Variable(w_alpha * tf.random_normal([1024, max_captcha * char_set_len]))
         bout = tf.Variable(self.b_alpha * tf.random_normal([self.max_captcha * self.char_set_len]))
         y_predict = tf.add(tf.matmul(dense, wout), bout)
         return y_predict
@@ -190,8 +186,8 @@ class TrainModel(object):
             init = tf.global_variables_initializer()
             sess.run(init)
             # 恢复模型
-            if os.path.exists("./model/"):
-                saver.restore(sess, "./model/")
+            if os.path.exists(self.model_save_dir):
+                saver.restore(sess, self.model_save_dir)
             else:
                 pass
             step = 1
@@ -202,13 +198,15 @@ class TrainModel(object):
                     batch_x_test, batch_y_test = self.get_batch(i, size=100)
                     acc = sess.run(accuracy, feed_dict={self.X: batch_x_test, self.Y: batch_y_test, self.keep_prob: 1.})
                     print("第{}次训练 >>> 准确率为 {} >>> loss {}".format(step, acc, cost_))
-                    # if acc > 0.99:
-                    #     saver.save(sess, "./model/")
-                    #     break
+                    # 准确率达到99%后保存并停止
+                    if acc > 0.99:
+                        saver.save(sess, self.model_save_dir)
+                        break
+                # 每训练500轮就保存一次
                 if i % 500 == 0:
-                    saver.save(sess, "./model/")
+                    saver.save(sess, self.model_save_dir)
                 step += 1
-            saver.save(sess, "./model/")
+            saver.save(sess, self.model_save_dir)
 
     def recognize_captcha(self):
         label, captcha_array = self.gen_captcha_text_image(random.choice(self.img_list))
@@ -225,7 +223,7 @@ class TrainModel(object):
 
         saver = tf.train.Saver()
         with tf.Session() as sess:
-            saver.restore(sess, "./model/")
+            saver.restore(sess, self.model_save_dir)
             predict = tf.argmax(tf.reshape(y_predict, [-1, self.max_captcha, self.char_set_len]), 2)
             text_list = sess.run(predict, feed_dict={self.X: [image], self.keep_prob: 1.})
             predict_text = text_list[0].tolist()
@@ -243,7 +241,8 @@ class TrainModel(object):
 def main():
     train_image_dir = sample_conf["train_image_dir"]
     char_set = sample_conf["char_set"]
-    tm = TrainModel(train_image_dir, char_set)
+    model_save_dir = sample_conf["model_save_dir"]
+    tm = TrainModel(train_image_dir, char_set, model_save_dir)
     # tm.train_cnn()
     tm.recognize_captcha()
 
