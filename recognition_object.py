@@ -10,18 +10,17 @@ for i in range(10):
 import tensorflow as tf
 import numpy as np
 from PIL import Image
-import os
+from sample import sample_conf
 
 
 class Recognizer(object):
-    def __init__(self, image_height, image_width, max_captcha):
+    def __init__(self, image_height, image_width, max_captcha, char_set):
         self.w_alpha = 0.01
         self.b_alpha = 0.1
         self.image_height = image_height
         self.image_width = image_width
         self.max_captcha = max_captcha
-        self.char_set = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',
-                         'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
+        self.char_set = char_set
         self.char_set_len = len(self.char_set)
         # tf初始化占位符
         self.X = tf.placeholder(tf.float32, [None, self.image_height * self.image_width])  # 特征向量
@@ -135,10 +134,11 @@ class Recognizer(object):
 
 
 def main():
-    image_height = 40
-    image_width = 80
-    max_captcha = 4
-    R = Recognizer(image_height, image_width, max_captcha)
+    image_height = sample_conf["image_height"]
+    image_width = sample_conf["image_width"]
+    max_captcha = sample_conf["max_captcha"]
+    char_set = sample_conf["char_set"]
+    R = Recognizer(image_height, image_width, max_captcha, char_set)
     r_img = Image.open("./sample/test/2b3n_6915e26c67a52bc0e4e13d216eb62b37.jpg")
     t = R.rec_image(r_img)
     print(t)

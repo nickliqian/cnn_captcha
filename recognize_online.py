@@ -12,13 +12,15 @@ from io import BytesIO
 import time
 import json
 import os
+from sample import sample_conf
 
 
-def recognize_captcha(remote_url, rec_times):
+def recognize_captcha(remote_url, rec_times, save_path, image_suffix):
+    image_file_name = 'captcha.{}'.format(image_suffix)
+
     headers = {
         'user-agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.146 Safari/537.36",
     }
-    save_path = "./sample/online/"  # 下载图片保存的地址
 
     for index in range(rec_times):
         # 请求
@@ -35,7 +37,7 @@ def recognize_captcha(remote_url, rec_times):
         # 识别
         s = time.time()
         url = "http://127.0.0.1:6000/b"
-        files = {'image_file': ('captcha.jpg', BytesIO(response.content), 'application')}
+        files = {'image_file': (image_file_name, BytesIO(response.content), 'application')}
         r = requests.post(url=url, files=files)
         e = time.time()
 
@@ -46,7 +48,7 @@ def recognize_captcha(remote_url, rec_times):
         print("【{}】 index:{} 耗时：{}ms 预测结果：{}".format(now_time, index, int((e-s)*1000), predict_text))
 
         # 保存文件
-        img_name = "{}_{}.jpg".format(predict_text, str(time.time()).replace(".", ""))
+        img_name = "{}_{}.{}".format(predict_text, str(time.time()).replace(".", ""), image_suffix)
         path = os.path.join(save_path, img_name)
         with open(path, "wb") as f:
             f.write(response.content)
@@ -55,9 +57,11 @@ def recognize_captcha(remote_url, rec_times):
 
 def main():
     # 配置相关参数
-    remote_url = "https://www.xxxxxxx.com/getImg"
+    save_path = sample_conf["online_image_dir"]  # 下载图片保存的地址
+    remote_url = sample_conf["remote_url"]  # 网络验证码地址
+    image_suffix = sample_conf["image_suffix"]  # 文件后缀
     rec_times = 1
-    recognize_captcha(remote_url, rec_times)
+    recognize_captcha(remote_url, rec_times, save_path, image_suffix)
 
 
 if __name__ == '__main__':

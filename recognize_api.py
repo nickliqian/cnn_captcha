@@ -15,15 +15,19 @@ from recognition_object import Recognizer
 import time
 from flask import Flask, request, jsonify, Response
 from PIL import Image
+from sample import sample_conf
 
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
 os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
-# 需要配置参数
-image_height = 40
-image_width = 80
-max_captcha = 4
+# 配置参数
+image_height = sample_conf["image_height"]
+image_width = sample_conf["image_width"]
+max_captcha = sample_conf["max_captcha"]
+api_image_dir = sample_conf["api_image_dir"]
+image_suffix = sample_conf["image_suffix"]  # 文件后缀
 
+# Flask对象
 app = Flask(__name__)
 basedir = os.path.abspath(os.path.dirname(__file__))
 
@@ -50,9 +54,9 @@ def up_image():
         value = R.rec_image(img)
         print("识别结果: {}".format(value))
         # 保存图片
-        path = basedir + "/sample/api/"  # 接收
-        file_name = "{}_{}.jpg".format(value, timec)
-        file_path = os.path.join(path + file_name)
+        print("保存图片： {}{}_{}.{}".format(api_image_dir, value, timec, image_suffix))
+        file_name = "{}_{}.{}".format(value, timec, image_suffix)
+        file_path = os.path.join(api_image_dir + file_name)
         img.save(file_path)
         result = {
             'time': timec,

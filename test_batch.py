@@ -137,8 +137,6 @@ def test_batch():
     print("{}个样本识别耗时{}秒，准确率{}".format(total, e-s, rate))
 
 
-# char_set = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']
-# char_set = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z']
 def main():
     global image_height
     global image_width
