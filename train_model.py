@@ -243,8 +243,8 @@ def main():
     char_set = sample_conf["char_set"]
     model_save_dir = sample_conf["model_save_dir"]
     tm = TrainModel(train_image_dir, char_set, model_save_dir)
-    # tm.train_cnn()
-    tm.recognize_captcha()
+    tm.train_cnn()
+    # tm.recognize_captcha()
 
 
 if __name__ == '__main__':
