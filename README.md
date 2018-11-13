@@ -1,9 +1,11 @@
 # cnn_captcha
-use cnn recognize captcha by tensorflow  
-本项目针对字符型图片验证码，使用tensorflow实现卷积神经网络，进行验证码识别。  
+use CNN recognize captcha by tensorflow  
 
-# 0 目录结构和依赖
-## 0.1 目录结构
+本项目针对字符型图片验证码，使用tensorflow实现卷积神经网络，进行验证码识别。  
+项目封装了比较通用的校验、训练、验证、识别、API模块，极大的减少了识别字符型验证码花费的时间和精力。  
+
+# 1 项目介绍
+## 1.1 目录结构
 - sample.py  
 配置文件
 - verify_and_split_data.py  
@@ -23,17 +25,25 @@ use cnn recognize captcha by tensorflow
 - model文件夹
 存放模型文件
 
-## 0.1 依赖
+## 1.2 依赖
 ```
 pip3 install tensorflow flask requests PIL matplotlib
 ```
+## 1.3 模型结构
+input  
+卷积层 + 池化层 + 降采样层 + ReLU  
+卷积层 + 池化层 + 降采样层 + ReLU  
+卷积层 + 池化层 + 降采样层 + ReLU  
+全连接 + 降采样层 + Relu  
+全连接 + softmax  
+output  
 
-# 1 使用
-## 1.1 数据集
+# 2 使用
+## 2.1 数据集
 原始数据集可以存放在`./sample/origin`目录中  
 为了便于处理，图片最好以`2e8j_17322d3d4226f0b5c5a71d797d2ba7f7.jpg`格式命名（标签_序列号.后缀）
 
-## 1.2 配置
+## 2.2 配置
 创建一个新项目前，需要自行修改相关配置文件
 ```
 图片文件夹
@@ -62,7 +72,7 @@ sample_conf.remote_url = "https://www.xxxxx.com/getImg"
 ```
 具体配置的作用会在使用相关脚本的过程中提到
 
-## 1.3 验证和拆分数据集
+## 2.3 验证和拆分数据集
 此功能会校验原始图片集的尺寸和测试图片是否能打开，并按照19:1的比例拆分出训练集和测试集。  
 所以需要分别创建和指定三个文件夹：origin，train，test用于存放相关文件。
 
@@ -72,7 +82,7 @@ sample_conf.remote_url = "https://www.xxxxx.com/getImg"
 python3 verify_and_split_data.py
 ```
 
-## 1.4 训练模型
+## 2.4 训练模型
 创建好训练集和测试集之后，就可以开始训练模型了。  
 这里不具体介绍tensorflow安装相关问题，直奔主题。  
 确保图片相关参数和目录设置正确后，执行以下命令开始训练：
@@ -97,7 +107,7 @@ tm.recognize_captcha()  # 识别演示
 
 ```
 
-## 1.5 批量验证
+## 2.5 批量验证
 使用测试集的图片进行验证，输出准确率。  
 ```
 python3 test_batch.py
@@ -118,7 +128,7 @@ tb.test_batch()  # 开始验证
 
 ```
 
-## 1.6 启动web server
+## 2.6 启动web server
 项目已经封装好加载模型和识别图片的类，启动web server后调用接口就可以使用识别服务。  
 启动web server
 ```
@@ -126,7 +136,7 @@ python3 recognize_api.py
 ```
 接口url为`http://127.0.0.1:6000/b`
 
-## 1.7 调用接口
+## 2.7 调用接口
 使用requests调用接口:
 ```
 url = "http://127.0.0.1:6000/b"
@@ -142,6 +152,8 @@ r = requests.post(url=url, files=files)
 ```
 文件`recognize_online.py`是使用接口在线识别的例子
 
+# 3 说明
+1. 目前没有保存用于tensorboard的日志文件
 
-# 2 时间表
-2018.11.12 初版Readme.md
+# 4 时间表
+2018.11.12 - 初版Readme.md
