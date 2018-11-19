@@ -25,13 +25,16 @@ use CNN recognize captcha by tensorflow.
 pip3 install tensorflow flask requests PIL matplotlib
 ```
 ## 1.3 模型结构
-input  
-卷积层 + 池化层 + 降采样层 + ReLU  
-卷积层 + 池化层 + 降采样层 + ReLU  
-卷积层 + 池化层 + 降采样层 + ReLU  
-全连接 + 降采样层 + Relu  
-全连接 + softmax  
-output  
+
+| 序号 | 层级 |
+| :------: | :------: |
+| 输入 | input |
+| 1 | 卷积层 + 池化层 + 降采样层 + ReLU  |
+| 2 | 卷积层 + 池化层 + 降采样层 + ReLU  |
+| 3 | 卷积层 + 池化层 + 降采样层 + ReLU  |
+| 4 | 全连接 + 降采样层 + Relu   |
+| 5 | 全连接 + softmax  |
+| 输出 | output  |
 
 # 2 使用
 ## 2.1 数据集
@@ -84,7 +87,7 @@ python3 verify_and_split_data.py
 ```
 python3 train_model.py
 ```
-也可以调用类开始训练和执行一次简单的识别演示
+也可以调用类开始训练或执行一次简单的识别演示
 ```
 from train_model import TrainModel
 from sample import sample_conf
