@@ -1,29 +1,24 @@
 # cnn_captcha
-use CNN recognize captcha by tensorflow  
+use CNN recognize captcha by tensorflow.  
 
 本项目针对字符型图片验证码，使用tensorflow实现卷积神经网络，进行验证码识别。  
-项目封装了比较通用的校验、训练、验证、识别、API模块，极大的减少了识别字符型验证码花费的时间和精力。  
+项目封装了比较通用的**校验、训练、验证、识别、API模块**，极大的减少了识别字符型验证码花费的时间和精力。  
 
 # 1 项目介绍
 ## 1.1 目录结构
-- sample.py  
-配置文件
-- verify_and_split_data.py  
-验证数据集和拆分数据为训练集和测试集
-- train_model.py  
-训练模型
-- test_batch.py  
-批量测试
-- recognition_object.py  
-封装好的识别类
-- recognize_api.py  
-使用flask写的提供在线识别功能的接口
-- recognize_online.py  
-使用接口识别的例子
-- sample文件夹  
-存放数据集
-- model文件夹
-存放模型文件
+
+| 序号 | 文件名称 | 说明 |
+| ------ | ------ | ------ |
+| 1 | sample.py | 配置文件 |
+| 2 | verify_and_split_data.py | 验证数据集和拆分数据为训练集和测试集 |
+| 3 | train_model.py | 训练模型 |
+| 4 | test_batch.py | 批量验证 |
+| 5 | recognition_object.py | 封装好的识别类 |
+| 6 | recognize_api.py | 使用flask写的提供在线识别功能的接口 |
+| 7 | recognize_online.py | 使用接口识别的例子 |
+| 8 | sample文件夹  | 存放数据集 |
+| 9 | model文件夹 | 存放模型文件 |
+
 
 ## 1.2 依赖
 ```
@@ -44,7 +39,7 @@ output
 为了便于处理，图片最好以`2e8j_17322d3d4226f0b5c5a71d797d2ba7f7.jpg`格式命名（标签_序列号.后缀）
 
 ## 2.2 配置
-创建一个新项目前，需要自行修改相关配置文件
+创建一个新项目前，需要自行**修改相关配置文件**
 ```
 图片文件夹
 sample_conf.origin_image_dir = "./sample/origin/"  # 原始文件
