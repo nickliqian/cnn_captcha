@@ -16,7 +16,7 @@ sample_conf.model_save_dir = "./model/"
 sample_conf.image_width = 80
 sample_conf.image_height = 40
 sample_conf.max_captcha = 4
-sample_conf.image_suffix = "jpg"
+sample_conf.image_suffix = "png"
 
 # 验证码字符相关参数
 sample_conf.char_set = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',

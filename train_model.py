@@ -114,6 +114,10 @@ class TrainModel(object):
         print("{}:{}".format(s, e))
 
         for i, img_name in enumerate(this_batch):
+            assert img_name.endswith(sample_conf['image_suffix']),'confirm your train directory only hava train poto file'
+            # if not img_name.endswith(sample_conf['image_suffix']):
+            #     print('missing file:{}'.formate(img_name))
+            #     continue
             label, image_array = self.gen_captcha_text_image(img_name)
             image_array = self.convert2gray(image_array)  # 灰度化图片
             batch_x[i, :] = image_array.flatten() / 255  # flatten 转为一维
