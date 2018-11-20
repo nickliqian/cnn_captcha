@@ -18,6 +18,7 @@ use CNN recognize captcha by tensorflow.
 | 7 | recognize_online.py | 使用接口识别的例子 |
 | 8 | sample文件夹  | 存放数据集 |
 | 9 | model文件夹 | 存放模型文件 |
+| 10 | gen_image/gen_sample_by_captcha.py | 生成验证码的脚本 |
 
 
 ## 1.2 依赖
