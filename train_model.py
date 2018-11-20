@@ -7,10 +7,14 @@ from PIL import Image
 import random
 import os
 from sample import sample_conf
+from tensorflow.python.framework.errors_impl import NotFoundError
 
 # 设置以下环境变量可开启CPU识别
 # os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
 # os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+
+class TrainError(Exception):
+    pass
 
 
 class TrainModel(object):
@@ -106,6 +110,9 @@ class TrainModel(object):
         batch_y = np.zeros([size, self.max_captcha * self.char_set_len])  # 初始化
 
         max_batch = int(len(self.img_list) / size)
+        print(max_batch)
+        if max_batch - 1 < 0:
+            raise TrainError("训练集图片数量需要大于每批次训练的图片数量")
         if n > max_batch - 1:
             n = n % max_batch
         s = n * size
@@ -187,7 +194,11 @@ class TrainModel(object):
             sess.run(init)
             # 恢复模型
             if os.path.exists(self.model_save_dir):
-                saver.restore(sess, self.model_save_dir)
+                try:
+                    saver.restore(sess, self.model_save_dir)
+                # 判断捕获model文件夹中没有模型文件的错误
+                except NotFoundError:
+                    print("model文件夹为空，将创建新模型")
             else:
                 pass
             step = 1
