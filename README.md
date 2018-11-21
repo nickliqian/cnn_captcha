@@ -22,7 +22,7 @@ use CNN recognize captcha by tensorflow.
 
 # 1 项目介绍
 ## 1.1 关于验证码识别
-验证码识别大多是爬虫会遇到的问题，目前通常使用如下几种方法：  
+验证码识别大多是爬虫会遇到的问题，也可以作为图像识别的入门案例。目前通常使用如下几种方法：  
 
 | 方法名称 | 相关要点 |
 | ------ | ------ |
@@ -52,20 +52,20 @@ use CNN recognize captcha by tensorflow.
 这里列出目前**常用的验证码**生成库：
 >参考：[Java验证全家桶](https://www.cnblogs.com/cynchanpin/p/6912301.html)  
 
-| 验证码库名称 | 样例 |
-| ------ | ------ |
-| Java验证码生成库 JCaptcha [更多示例](https://jcaptcha.atlassian.net/wiki/spaces/general/pages/1212427/Samples+tests)  | ![效果1](./readme_image/jcaptcha1.jpg) ![效果2](./readme_image/jcaptcha2.jpg) ![效果3](./readme_image/jcaptcha3.jpg) |
-| Struts验证码插件 JCaptcha4Struts2   |  |
-| Java图形验证码 SimpleCaptcha [一些例子](https://www.oschina.net/p/simplecaptcha)   | ![效果1](./readme_image/SimpleCaptcha_1.jpg) ![效果2](./readme_image/SimpleCaptcha_2.jpg) ![效果3](./readme_image/SimpleCaptcha_3.jpg) |
-| Java验证码 kaptcha [例子](https://github.com/linghushaoxia/kaptcha) | ![水纹效果](./readme_image/Kaptcha_5.png) ![鱼眼效果](./readme_image/Kaptcha_2.png) ![阴影效果](./readme_image/Kaptcha_3.png) |
-| Java验证码 patchca | ![效果1](./readme_image/patchca_1.png) |
-| Java验证码生成库 imageRandom |  |  
-| Java验证码库 iCaptcha | ![效果1](./readme_image/iCaptcha.jpg) |  
-| Java图片验证库SkewPassImage | ![效果1](./readme_image/SkewPassImage.jpg) |  
-| Java 验证码 Cage | ![效果1](./readme_image/Cage1.jpg) ![效果2](./readme_image/Cage2.jpg) |
-| Python验证码 captcha [例子](https://github.com/nickliqian/cnn_captcha/blob/master/gen_image/gen_sample_by_captcha.py) | ![py_Captcha](./readme_image/py_Captcha-1.jpg) |
-| PHP Gregwar/Captcha |  |
-| PHP mewebstudio/captcha |  |
+| 语言 | 验证码库名称 | 链接 | 样例 |
+| ------ | ------ | ------ | ------ |
+| Java | JCaptcha | [示例](https://jcaptcha.atlassian.net/wiki/spaces/general/pages/1212427/Samples+tests)  | ![效果1](./readme_image/jcaptcha1.jpg) ![效果2](./readme_image/jcaptcha2.jpg) ![效果3](./readme_image/jcaptcha3.jpg) |
+| Java | JCaptcha4Struts2 |  |  |
+| Java | SimpleCaptcha | [例子](https://www.oschina.net/p/simplecaptcha)   | ![效果1](./readme_image/SimpleCaptcha_1.jpg) ![效果2](./readme_image/SimpleCaptcha_2.jpg) ![效果3](./readme_image/SimpleCaptcha_3.jpg) |
+| Java | kaptcha | [例子](https://github.com/linghushaoxia/kaptcha) | ![水纹效果](./readme_image/Kaptcha_5.png) ![鱼眼效果](./readme_image/Kaptcha_2.png) ![阴影效果](./readme_image/Kaptcha_3.png) |
+| Java | patchca |  | ![效果1](./readme_image/patchca_1.png) |
+| Java | imageRandom |  |  |  
+| Java | iCaptcha |  | ![效果1](./readme_image/iCaptcha.jpg) |  
+| Java | SkewPassImage |  | ![效果1](./readme_image/SkewPassImage.jpg) |  
+| Java | Cage |  | ![效果1](./readme_image/Cage1.jpg) ![效果2](./readme_image/Cage2.jpg) |
+| Python | captcha | [例子](https://github.com/nickliqian/cnn_captcha/blob/master/gen_image/gen_sample_by_captcha.py) | ![py_Captcha](./readme_image/py_Captcha-1.jpg) |
+| PHP | Gregwar/Captcha | [文档](https://github.com/Gregwar/Captcha) |  |
+| PHP | mewebstudio/captcha | [文档](https://github.com/mewebstudio/captcha) |  |
 
 ## 1.2 目录结构
 
@@ -217,3 +217,4 @@ r = requests.post(url=url, files=files)
 
 # 4 时间表
 2018.11.12 - 初版Readme.md
+2018.11.21 - 加入关于验证码识别的一些说明
