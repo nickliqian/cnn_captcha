@@ -1,11 +1,73 @@
 # cnn_captcha
 use CNN recognize captcha by tensorflow.  
-
 本项目针对字符型图片验证码，使用tensorflow实现卷积神经网络，进行验证码识别。  
 项目封装了比较通用的**校验、训练、验证、识别、API模块**，极大的减少了识别字符型验证码花费的时间和精力。  
 
+# 目录
+<a href="#项目介绍">1 项目介绍</a>  
+<a href="#关于验证码识别">1.1 关于验证码识别</a>  
+<a href="#目录结构">1.2 目录结构</a>  
+<a href="#依赖">1.3 依赖</a>  
+<a href="#模型结构">1.4 模型结构</a>  
+<a href="#如何使用">2 如何使用</a>  
+<a href="#数据集">2.1 数据集</a>  
+<a href="#配置文件">2.2 配置文件</a>  
+<a href="#验证和拆分数据集">2.3 验证和拆分数据集</a>  
+<a href="#训练模型">2.4 训练模型</a>  
+<a href="#批量验证">2.5 批量验证</a>  
+<a href="#启动WebServer">2.6 启动WebServer</a>  
+<a href="#调用接口">2.7 调用接口</a>  
+<a href="#说明">3 说明</a>  
+<a href="#时间表">4 时间表</a>  
+
 # 1 项目介绍
-## 1.1 目录结构
+## 1.1 关于验证码识别
+验证码识别大多是爬虫会遇到的问题，目前通常使用如下几种方法：  
+
+| 方法名称 | 相关要点 |
+| ------ | ------ |
+| tesseract | 仅适合识别没有干扰和扭曲的图片，训练起来很麻烦 |
+| 其他开源识别库 | 不够通用，识别率未知 |
+| 付费OCR API | 需求量大的情形成本很高 |
+| 图像处理+机器学习分类算法 | 涉及多种技术，学习成本高，且不通用 |
+| 卷积神经网络 | 一定的学习成本，算法适用于多类验证码 |
+
+这里说一下使用传统的**图像处理和机器学习算法**，涉及多种技术：  
+
+1. 图像处理
+- 前处理（灰度化、二值化）
+- 图像分割
+- 裁剪（去边框）
+- 图像滤波、降噪
+- 去背景
+- 颜色分离
+- 旋转
+2. 机器学习
+- KNN
+- SVM
+
+使用这类方法对使用者的要求较高，且由于图片的变化类型较多，处理的方法不够通用，经常花费很多时间去调整处理步骤和相关算法。  
+而使用**卷积神经网络**，只需要通过简单的前处理，就可以实现大部分静态字符型验证码的端到端识别，效果很好，通用性很高。  
+
+这里列出目前**常用的验证码**生成库：
+>参考：[Java验证全家桶](https://www.cnblogs.com/cynchanpin/p/6912301.html)  
+
+| 验证码库名称 | 样例 |
+| ------ | ------ |
+| Java验证码生成库 JCaptcha [更多示例](https://jcaptcha.atlassian.net/wiki/spaces/general/pages/1212427/Samples+tests)  | ![效果1](./readme_image/jcaptcha1.jpg) ![效果2](./readme_image/jcaptcha2.jpg) ![效果3](./readme_image/jcaptcha3.jpg) |
+| Struts验证码插件 JCaptcha4Struts2   |  |
+| Java图形验证码 SimpleCaptcha [一些例子](https://www.oschina.net/p/simplecaptcha)   | ![效果1](./readme_image/SimpleCaptcha_1.jpg) ![效果2](./readme_image/SimpleCaptcha_2.jpg) ![效果3](./readme_image/SimpleCaptcha_3.jpg) |
+| Java验证码 kaptcha [例子](https://github.com/linghushaoxia/kaptcha) | ![水纹效果](./readme_image/Kaptcha_5.png) ![鱼眼效果](./readme_image/Kaptcha_2.png) ![阴影效果](./readme_image/Kaptcha_3.png) |
+| Java验证码 patchca | ![效果1](./readme_image/patchca_1.png) |
+| Java验证码生成库 imageRandom |  |  
+| Java验证码库 iCaptcha | ![效果1](./readme_image/iCaptcha.jpg) |  
+| Java图片验证库SkewPassImage | ![效果1](./readme_image/SkewPassImage.jpg) |  
+| Java 验证码 Cage | ![效果1](./readme_image/Cage1.jpg) ![效果2](./readme_image/Cage2.jpg) |
+| Python验证码 captcha [例子](https://github.com/nickliqian/cnn_captcha/blob/master/gen_image/gen_sample_by_captcha.py) | ![py_Captcha](./readme_image/py_Captcha-1.jpg) |
+| PHP Gregwar/Captcha |  |
+| PHP mewebstudio/captcha |  |
+
+## 1.2 目录结构
 
 | 序号 | 文件名称 | 说明 |
 | ------ | ------ | ------ |
@@ -20,12 +82,11 @@ use CNN recognize captcha by tensorflow.
 | 9 | model文件夹 | 存放模型文件 |
 | 10 | gen_image/gen_sample_by_captcha.py | 生成验证码的脚本 |
 
-
-## 1.2 依赖
+## 1.3 依赖
 ```
 pip3 install tensorflow flask requests PIL matplotlib
 ```
-## 1.3 模型结构
+## 1.4 模型结构
 
 | 序号 | 层级 |
 | :------: | :------: |
@@ -37,12 +98,12 @@ pip3 install tensorflow flask requests PIL matplotlib
 | 5 | 全连接 + softmax  |
 | 输出 | output  |
 
-# 2 使用
+# 2 如何使用
 ## 2.1 数据集
 原始数据集可以存放在`./sample/origin`目录中  
 为了便于处理，图片最好以`2e8j_17322d3d4226f0b5c5a71d797d2ba7f7.jpg`格式命名（标签_序列号.后缀）
 
-## 2.2 配置
+## 2.2 配置文件
 创建一个新项目前，需要自行**修改相关配置文件**
 ```
 图片文件夹
@@ -127,7 +188,7 @@ tb.test_batch()  # 开始验证
 
 ```
 
-## 2.6 启动web server
+## 2.6 启动WebServer
 项目已经封装好加载模型和识别图片的类，启动web server后调用接口就可以使用识别服务。  
 启动web server
 ```
