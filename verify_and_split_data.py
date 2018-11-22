@@ -31,30 +31,33 @@ def verify(origin_dir, real_width, real_height):
         # 过滤图片标签不标准的情况
         prefix, posfix = img_name.split("_")
         if prefix == "" or posfix == "":
-            bad_img.append((index, file_path, "图片标签异常"))
+            bad_img.append((index, img_name, "图片标签异常"))
             continue
 
         # 图片无法正常打开
         try:
             img = Image.open(file_path)
         except OSError:
-            bad_img.append((index, file_path, "图片无法正常打开"))
+            bad_img.append((index, img_name, "图片无法正常打开"))
             continue
 
-        # 图片储存有异常
+        # 图片尺寸有异常
         if real_size == img.size:
             print("{} pass".format(index), end='\r')
         else:
-            bad_img.append((index, file_path, img.size))
+            bad_img.append((index, img_name, "图片尺寸异常为：{}".format(img.size)))
 
+    print("====以下{}张图片有异常====".format(len(bad_img)))
     if bad_img:
         for b in bad_img:
-            print("第{}张图片 <{}> 尺寸异常 - 尺寸为 {}".format(b[0], b[1], b[2]))
+            print("[第{}张图片] [{}] [{}]".format(b[0], b[1], b[2]))
     else:
         print("未发现异常（共 {} 张图片）".format(len(img_list)))
+    print("========end")
+    return bad_img
 
 
-def split(origin_dir, train_dir, test_dir):
+def split(origin_dir, train_dir, test_dir, bad_imgs):
     """
     分离训练集和测试集
     :return:
@@ -63,7 +66,10 @@ def split(origin_dir, train_dir, test_dir):
 
     # 图片名称列表和数量
     img_list = os.listdir(origin_dir)
+    for img in bad_imgs:
+        img_list.remove(img)
     total_count = len(img_list)
+    print("共分配{}张图片到训练集和测试集，其中{}张为异常留在原始目录".format(total_count, len(bad_imgs)))
 
     # 创建文件夹
     if not os.path.exists(train_dir):
@@ -82,6 +88,7 @@ def split(origin_dir, train_dir, test_dir):
                 pass
             else:
                 test_set.add(file_name)
+                img_list.remove(file_name)
                 break
 
     test_list = list(test_set)
@@ -92,7 +99,7 @@ def split(origin_dir, train_dir, test_dir):
         shutil.move(src, dst)
 
     # 训练集
-    train_list = os.listdir(origin_dir)
+    train_list = img_list
     print("训练集数量为：{}".format(len(train_list)))
     for file_name in train_list:
         src = os.path.join(origin_dir, file_name)
@@ -112,8 +119,11 @@ def main():
     real_width = sample_conf["image_width"]
     real_height = sample_conf["image_height"]
 
-    verify(origin_dir, real_width, real_height)
-    split(origin_dir, train_dir, test_dir)
+    bad_images_info = verify(origin_dir, real_width, real_height)
+    bad_imgs = []
+    for info in bad_images_info:
+        bad_imgs.append(info[1])
+    split(origin_dir, train_dir, test_dir, bad_imgs)
 
 
 if __name__ == '__main__':

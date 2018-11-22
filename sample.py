@@ -13,8 +13,8 @@ sample_conf.online_image_dir = "./sample/online/"
 sample_conf.model_save_dir = "./model/"
 
 # 图片相关参数
-sample_conf.image_width = 80
-sample_conf.image_height = 40
+sample_conf.image_width = 100
+sample_conf.image_height = 60
 sample_conf.max_captcha = 4
 sample_conf.image_suffix = "jpg"
 
