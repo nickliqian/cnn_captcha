@@ -26,17 +26,18 @@ def verify(origin_dir, real_width, real_height):
 
     # 遍历所有图片进行验证
     for index, img_name in enumerate(img_list):
+        file_path = os.path.join(origin_dir, img_name)
+
         # 过滤图片标签不标准的情况
         prefix, posfix = img_name.split("_")
-        if (not prefix) or (not posfix):
+        if prefix=="" or posfix=="":
+            bad_img.append((index, file_path, "图片标签异常"))
             continue
 
-        file_path = os.path.join(origin_dir, img_name)
         try:
             img = Image.open(file_path)
         except OSError:
-            bad_img.append((index, file_path, img.size))
-            print("图片无法正常打开")
+            bad_img.append((index, file_path, "图片无法正常打开"))
             continue
 
         if real_size == img.size:

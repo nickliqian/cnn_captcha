@@ -84,7 +84,7 @@ use CNN recognize captcha by tensorflow.
 
 ## 1.3 依赖
 ```
-pip3 install tensorflow flask requests PIL matplotlib
+pip3 install tensorflow flask requests PIL matplotlib easydict
 ```
 ## 1.4 模型结构
 
