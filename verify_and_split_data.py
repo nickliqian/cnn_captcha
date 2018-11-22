@@ -30,16 +30,18 @@ def verify(origin_dir, real_width, real_height):
 
         # 过滤图片标签不标准的情况
         prefix, posfix = img_name.split("_")
-        if prefix=="" or posfix=="":
+        if prefix == "" or posfix == "":
             bad_img.append((index, file_path, "图片标签异常"))
             continue
 
+        # 图片无法正常打开
         try:
             img = Image.open(file_path)
         except OSError:
             bad_img.append((index, file_path, "图片无法正常打开"))
             continue
 
+        # 图片储存有异常
         if real_size == img.size:
             print("{} pass".format(index), end='\r')
         else:
