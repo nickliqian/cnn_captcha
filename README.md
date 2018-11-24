@@ -145,10 +145,10 @@ python3 verify_and_split_data.py
 ```开始校验原始图片集
 Total image count: 10094
 ====以下4张图片有异常====
-[第1815张图片] [_15355300402751045.gif] [图片标签异常]
+[第2123张图片] [325.txt] [文件后缀不正确]
 [第3515张图片] [_15355300508855503.gif] [图片标签异常]
-[第6413张图片] [_15355300721958663.gif] [图片标签异常]
-[第9437张图片] [_15355300466073782.gif] [图片标签异常]
+[第6413张图片] [qwer_15355300721958663.gif] [图片尺寸异常为：(50, 50)]
+[第9437张图片] [abcd_15355300466073782.gif] [图片无法正常打开]
 ========end
 开始分离原始图片集为：测试集（5%）和训练集（95%）
 共分配10090张图片到训练集和测试集，其中4张为异常留在原始目录
@@ -173,7 +173,8 @@ train_image_dir = sample_conf["train_image_dir"]
 char_set = sample_conf["char_set"]
 model_save_dir = sample_conf["model_save_dir"]
 
-tm = TrainModel(train_image_dir, char_set, model_save_dir)
+# verify参数默认为False，当verify=True则会在训练前校验所有图片格式时候为指定的后缀
+tm = TrainModel(train_image_dir, char_set, model_save_dir, verify=False)
 
 tm.train_cnn()  # 执行训练
 
@@ -230,5 +231,6 @@ r = requests.post(url=url, files=files)
 1. 目前没有保存用于tensorboard的日志文件
 
 # 4 时间表
-2018.11.12 - 初版Readme.md
-2018.11.21 - 加入关于验证码识别的一些说明
+2018.11.12 - 初版Readme.md  
+2018.11.21 - 加入关于验证码识别的一些说明  
+2018.11.24 - 优化校验数据集图片的规则  

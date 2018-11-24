@@ -18,12 +18,17 @@ class TrainError(Exception):
 
 
 class TrainModel(object):
-    def __init__(self, img_path, char_set, model_save_dir):
+    def __init__(self, img_path, char_set, model_save_dir, verify=False):
         # 模型路径
         self.model_save_dir = model_save_dir
-        # 打乱文件顺序
+
+        # 打乱文件顺序+校验图片格式
         self.img_path = img_path
         self.img_list = os.listdir(img_path)
+        # 校验格式
+        if verify:
+            self.confirm_image_suffix()
+        # 打乱文件顺序
         random.seed(time.time())
         random.shuffle(self.img_list)
 
@@ -110,7 +115,7 @@ class TrainModel(object):
         batch_y = np.zeros([size, self.max_captcha * self.char_set_len])  # 初始化
 
         max_batch = int(len(self.img_list) / size)
-        print(max_batch)
+        # print(max_batch)
         if max_batch - 1 < 0:
             raise TrainError("训练集图片数量需要大于每批次训练的图片数量")
         if n > max_batch - 1:
@@ -118,18 +123,24 @@ class TrainModel(object):
         s = n * size
         e = (n + 1) * size
         this_batch = self.img_list[s:e]
-        print("{}:{}".format(s, e))
+        # print("{}:{}".format(s, e))
 
         for i, img_name in enumerate(this_batch):
-            assert img_name.endswith(sample_conf['image_suffix']),'confirm your train directory only hava train poto file'
-            # if not img_name.endswith(sample_conf['image_suffix']):
-            #     print('missing file:{}'.formate(img_name))
-            #     continue
             label, image_array = self.gen_captcha_text_image(img_name)
             image_array = self.convert2gray(image_array)  # 灰度化图片
             batch_x[i, :] = image_array.flatten() / 255  # flatten 转为一维
             batch_y[i, :] = self.text2vec(label)  # 生成 oneHot
         return batch_x, batch_y
+
+    def confirm_image_suffix(self):
+        # 在训练前校验所有文件格式
+        print("开始校验所有图片后缀")
+        for index, img_name in enumerate(self.img_list):
+            print("{} image pass".format(index), end='\r')
+            if not img_name.endswith(sample_conf['image_suffix']):
+                raise TrainError('confirm images suffix：you request [.{}] file but get file [{}]'
+                                 .format(sample_conf['image_suffix'], img_name))
+        print("所有图片格式校验通过")
 
     def model(self):
         x = tf.reshape(self.X, shape=[-1, self.image_height, self.image_width, 1])
@@ -257,9 +268,9 @@ def main():
     train_image_dir = sample_conf["train_image_dir"]
     char_set = sample_conf["char_set"]
     model_save_dir = sample_conf["model_save_dir"]
-    tm = TrainModel(train_image_dir, char_set, model_save_dir)
-    tm.train_cnn()
-    # tm.recognize_captcha()
+    tm = TrainModel(train_image_dir, char_set, model_save_dir, verify=False)
+    tm.train_cnn()  # 开始训练模型
+    # tm.recognize_captcha()  # 识别图片示例
 
 
 if __name__ == '__main__':

@@ -8,7 +8,7 @@ import shutil
 from sample import sample_conf
 
 
-def verify(origin_dir, real_width, real_height):
+def verify(origin_dir, real_width, real_height, image_suffix):
     """
     校验图片大小
     :return:
@@ -19,14 +19,18 @@ def verify(origin_dir, real_width, real_height):
     # 图片名称列表和数量
     img_list = os.listdir(origin_dir)
     total_count = len(img_list)
+    print("原始集共有图片: {}张".format(total_count))
 
     # 无效图片列表
     bad_img = []
-    print("Total image count: {}".format(len(img_list)))
 
     # 遍历所有图片进行验证
     for index, img_name in enumerate(img_list):
         file_path = os.path.join(origin_dir, img_name)
+        # 过滤图片不正确的后缀
+        if not img_name.endswith(image_suffix):
+            bad_img.append((index, img_name, "文件后缀不正确"))
+            continue
 
         # 过滤图片标签不标准的情况
         prefix, posfix = img_name.split("_")
@@ -53,7 +57,7 @@ def verify(origin_dir, real_width, real_height):
             print("[第{}张图片] [{}] [{}]".format(b[0], b[1], b[2]))
     else:
         print("未发现异常（共 {} 张图片）".format(len(img_list)))
-    print("========end")
+    print("========end\n")
     return bad_img
 
 
@@ -118,8 +122,10 @@ def main():
     # 图片尺寸
     real_width = sample_conf["image_width"]
     real_height = sample_conf["image_height"]
+    # 图片后缀
+    image_suffix = sample_conf["image_suffix"]
 
-    bad_images_info = verify(origin_dir, real_width, real_height)
+    bad_images_info = verify(origin_dir, real_width, real_height, image_suffix)
     bad_imgs = []
     for info in bad_images_info:
         bad_imgs.append(info[1])
