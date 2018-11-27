@@ -36,11 +36,14 @@ class TrainModel(object):
         label, captcha_array = self.gen_captcha_text_image(self.img_list[0])
 
         captcha_shape = captcha_array.shape
-        if len(captcha_shape) == 3:
-            image_height, image_width, channel = captcha_array.shape
+        captcha_shape_len = len(captcha_shape)
+        if captcha_shape_len == 3:
+            image_height, image_width, channel = captcha_shape
             self.channel = channel
-        elif len(captcha_array) == 2:
-            image_height, image_width = captcha_array.shape
+        elif captcha_shape_len == 2:
+            image_height, image_width = captcha_shape
+        else:
+            raise TrainError("图片转换为矩阵时出错，请检查图片格式")
 
         # 初始化变量
         # 图片尺寸
