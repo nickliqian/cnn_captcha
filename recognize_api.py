@@ -17,6 +17,7 @@ from flask import Flask, request, jsonify, Response
 from PIL import Image
 from sample import sample_conf
 
+# 默认使用CPU
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
 os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 

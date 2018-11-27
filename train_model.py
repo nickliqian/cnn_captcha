@@ -34,13 +34,18 @@ class TrainModel(object):
 
         # 获得图片宽高和字符长度基本信息
         label, captcha_array = self.gen_captcha_text_image(self.img_list[0])
-        image_height, image_width, channel = captcha_array.shape
+
+        captcha_shape = captcha_array.shape
+        if len(captcha_shape) == 3:
+            image_height, image_width, channel = captcha_array.shape
+            self.channel = channel
+        elif len(captcha_array) == 2:
+            image_height, image_width = captcha_array.shape
 
         # 初始化变量
         # 图片尺寸
         self.image_height = image_height
         self.image_width = image_width
-        self.channel = channel
         # 验证码长度（位数）
         self.max_captcha = len(label)
         # 验证码字符类别
