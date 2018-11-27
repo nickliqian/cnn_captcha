@@ -39,13 +39,21 @@ class TrainModel(object):
 
         # 获得图片宽高和字符长度基本信息
         label, captcha_array = self.gen_captcha_text_image(train_img_path, self.train_images_list[0])
-        image_height, image_width, channel = captcha_array.shape
+
+        captcha_shape = captcha_array.shape
+        captcha_shape_len = len(captcha_shape)
+        if captcha_shape_len == 3:
+            image_height, image_width, channel = captcha_shape
+            self.channel = channel
+        elif captcha_shape_len == 2:
+            image_height, image_width = captcha_shape
+        else:
+            raise TrainError("图片转换为矩阵时出错，请检查图片格式")
 
         # 初始化变量
         # 图片尺寸
         self.image_height = image_height
         self.image_width = image_width
-        self.channel = channel
         # 验证码长度（位数）
         self.max_captcha = len(label)
         # 验证码字符类别

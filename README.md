@@ -18,6 +18,7 @@ use CNN recognize captcha by tensorflow.
 - <a href="#批量验证">2.5 批量验证</a>  
 - <a href="#启动WebServer">2.6 启动WebServer</a>  
 - <a href="#调用接口">2.7 调用接口</a>  
+- <a href="#部署">2.8 部署</a>  
 
 <a href="#说明">3 说明</a>  
 
@@ -88,7 +89,7 @@ use CNN recognize captcha by tensorflow.
 
 ## 1.3 依赖
 ```
-pip3 install tensorflow flask requests PIL matplotlib easydict
+pip3 install tensorflow==1.7.0 flask==1.0.2 requests==2.19.1 Pillow==4.3.0 matplotlib==2.1.0 easydict==1.8
 ```
 ## 1.4 模型结构
 
@@ -245,6 +246,15 @@ r = requests.post(url=url, files=files)
 }
 ```
 文件`recognize_online.py`是使用接口在线识别的例子
+
+## 2.8 部署
+部署的时候，把`recognize_api.py`文件的最后一行修改为如下内容：
+```
+app.run(host='0.0.0.0',port=5000,debug=False)
+```
+然后开启端口访问权限，就可以通过外网访问了。  
+另外为了开启多进程处理请求，可以使用uwsgi+nginx组合进行部署。  
+这部分可以参考：[Flask部署选择](http://docs.jinkan.org/docs/flask/deploying/index.html)
 
 # 3 说明
 1. 目前没有保存用于tensorboard的日志文件
