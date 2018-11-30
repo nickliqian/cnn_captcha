@@ -109,3 +109,4 @@ venv.bak/
 # 数据文件
 sample/
 model/
+labels.json

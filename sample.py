@@ -1,5 +1,6 @@
 from easydict import EasyDict
-
+import os
+import json
 sample_conf = EasyDict()
 
 # 图片文件夹
@@ -23,5 +24,17 @@ sample_conf.char_set = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', '
                         'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
 # char_set = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']
 # char_set = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z']
+
+use_labels_json_file = False
+if use_labels_json_file:
+    if os.path.exists("gen_image/labels.json"):
+        with open("gen_image/labels.json", "r") as f:
+            content = f.read()
+            if content:
+                sample_conf.char_set = json.loads(content)
+            else:
+                pass
+    else:
+        pass
 
 sample_conf.remote_url = "https://www.xxxxx.com/getImg"

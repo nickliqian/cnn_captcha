@@ -1,7 +1,10 @@
 # cnn_captcha
 use CNN recognize captcha by tensorflow.  
 本项目针对字符型图片验证码，使用tensorflow实现卷积神经网络，进行验证码识别。  
-项目封装了比较通用的**校验、训练、验证、识别、API模块**，极大的减少了识别字符型验证码花费的时间和精力。  
+项目封装了比较通用的**校验、训练、验证、识别、API模块**，极大的减少了识别字符型验证码花费的时间和精力。 
+  
+项目已经帮助很多同学高效完成了验证码识别任务。
+如果你在使用过程中出现了bug和做了良好的改进，欢迎提出issue和PR，作者会尽快回复，希望能和你共同完善项目。 
 
 # 时间表
 2018.11.12 - 初版Readme.md  
@@ -28,6 +31,8 @@ use CNN recognize captcha by tensorflow.
 - <a href="#部署">2.8 部署</a>  
 
 <a href="#说明">3 说明</a>  
+
+<a href="#已知BUG">4 已知BUG</a>  
 
 
 
@@ -93,6 +98,7 @@ use CNN recognize captcha by tensorflow.
 | 9 | sample文件夹  | 存放数据集 |
 | 10 | model文件夹 | 存放模型文件 |
 | 11 | gen_image/gen_sample_by_captcha.py | 生成验证码的脚本 |
+| 12 | gen_image/collect_labels.py | 用于统计验证码标签（常用于中文验证码） |
 
 ## 1.3 依赖
 ```
@@ -146,6 +152,8 @@ sample_conf.char_set = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', '
 sample_conf.remote_url = "https://www.xxxxx.com/getImg"
 ```
 具体配置的作用会在使用相关脚本的过程中提到
+关于`验证码识别结果类别`，假设你的样本是中文验证码，你可以使用`gen_image/collect_labels.py`脚本进行标签的统计。
+会生成文件`gen_image/labels.json`存放所有标签，在配置文件中设置`use_labels_json_file = True`开启读取`labels.json`内容作为`结果类别`。
 
 ## 2.3 验证和拆分数据集
 此功能会校验原始图片集的尺寸和测试图片是否能打开，并按照19:1的比例拆分出训练集和测试集。  
@@ -269,3 +277,16 @@ app.run(host='0.0.0.0',port=5000,debug=False)
 # 3 说明
 1. 目前没有保存用于tensorboard的日志文件
 
+# 4 已知BUG
+1. 使用pycharm启动recognize_api.py文件报错
+```
+2018-12-01 00:35:15.106333: W T:\src\github\tensorflow\tensorflow\core\framework\op_kernel.cc:1273] OP_REQUIRES failed at save_restore_tensor.cc:170 : Invalid argument: Unsuccessful TensorSliceReader constructor: Failed to get matching files on ./model/: Not found: FindFirstFile failed for: ./model : ϵͳ�Ҳ���ָ����·����
+; No such process
+......
+tensorflow.python.framework.errors_impl.InvalidArgumentError: Unsuccessful TensorSliceReader constructor: Failed to get matching files on ./model/: Not found: FindFirstFile failed for: ./model : ϵͳ\udcd5Ҳ\udcbb\udcb5\udcbdָ\udcb6\udca8\udcb5\udcc4·\udcbe\udcb6\udca1\udca3
+; No such process
+	 [[Node: save/RestoreV2 = RestoreV2[dtypes=[DT_FLOAT, DT_FLOAT, DT_FLOAT, DT_FLOAT, DT_FLOAT, DT_FLOAT, DT_FLOAT, DT_FLOAT, DT_FLOAT, DT_FLOAT], _device="/job:localhost/replica:0/task:0/device:CPU:0"](_arg_save/Const_0_0, save/RestoreV2/tensor_names, save/RestoreV2/shape_and_slices)]]
+```
+由pycharm默认设置了工作空间，导致读取相对路径的model文件夹出错。
+解决办法：编辑运行配置，设置工作空间为项目目录即可。
+![bug_api启动失败](readme_image/bug_api启动失败.png)
