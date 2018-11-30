@@ -3,6 +3,13 @@ use CNN recognize captcha by tensorflow.
 本项目针对字符型图片验证码，使用tensorflow实现卷积神经网络，进行验证码识别。  
 项目封装了比较通用的**校验、训练、验证、识别、API模块**，极大的减少了识别字符型验证码花费的时间和精力。  
 
+# 时间表
+2018.11.12 - 初版Readme.md  
+2018.11.21 - 加入关于验证码识别的一些说明  
+2018.11.24 - 优化校验数据集图片的规则  
+2018.11.26 - 新增`train_model_v2.py`文件，训练过程中同时输出训练集和验证集的准确率  
+
+
 # 目录
 <a href="#项目介绍">1 项目介绍</a>  
 - <a href="#关于验证码识别">1.1 关于验证码识别</a>  
@@ -22,7 +29,6 @@ use CNN recognize captcha by tensorflow.
 
 <a href="#说明">3 说明</a>  
 
-<a href="#时间表">4 时间表</a>  
 
 
 # 1 项目介绍
@@ -79,13 +85,14 @@ use CNN recognize captcha by tensorflow.
 | 1 | sample.py | 配置文件 |
 | 2 | verify_and_split_data.py | 验证数据集和拆分数据为训练集和测试集 |
 | 3 | train_model.py | 训练模型 |
-| 4 | test_batch.py | 批量验证 |
-| 5 | recognition_object.py | 封装好的识别类 |
-| 6 | recognize_api.py | 使用flask写的提供在线识别功能的接口 |
-| 7 | recognize_online.py | 使用接口识别的例子 |
-| 8 | sample文件夹  | 存放数据集 |
-| 9 | model文件夹 | 存放模型文件 |
-| 10 | gen_image/gen_sample_by_captcha.py | 生成验证码的脚本 |
+| 4 | train_model_v2.py | 训练模型，训练过程中同时输出训练集和验证集的准确率，推荐使用此种方式训练 |
+| 5 | test_batch.py | 批量验证 |
+| 6 | recognition_object.py | 封装好的识别类 |
+| 7 | recognize_api.py | 使用flask写的提供在线识别功能的接口 |
+| 8 | recognize_online.py | 使用接口识别的例子 |
+| 9 | sample文件夹  | 存放数据集 |
+| 10 | model文件夹 | 存放模型文件 |
+| 11 | gen_image/gen_sample_by_captcha.py | 生成验证码的脚本 |
 
 ## 1.3 依赖
 ```
@@ -106,7 +113,10 @@ pip3 install tensorflow==1.7.0 flask==1.0.2 requests==2.19.1 Pillow==4.3.0 matpl
 # 2 如何使用
 ## 2.1 数据集
 原始数据集可以存放在`./sample/origin`目录中  
-为了便于处理，图片最好以`2e8j_17322d3d4226f0b5c5a71d797d2ba7f7.jpg`格式命名（标签_序列号.后缀）
+为了便于处理，图片最好以`2e8j_17322d3d4226f0b5c5a71d797d2ba7f7.jpg`格式命名（标签_序列号.后缀） 
+  
+如果你没有训练集，你可以使用`gen_sample_by_captcha.py`文件生成训练集文件。
+生成之前你需要修改相关配置（路径、文件后缀、字符集等）。
 
 ## 2.2 配置文件
 创建一个新项目前，需要自行**修改相关配置文件**
@@ -259,8 +269,3 @@ app.run(host='0.0.0.0',port=5000,debug=False)
 # 3 说明
 1. 目前没有保存用于tensorboard的日志文件
 
-# 4 时间表
-2018.11.12 - 初版Readme.md  
-2018.11.21 - 加入关于验证码识别的一些说明  
-2018.11.24 - 优化校验数据集图片的规则  
-2018.11.26 - 新增`train_model_v2.py`文件，训练过程中同时输出训练集和验证集的准确率    
