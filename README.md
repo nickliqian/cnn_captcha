@@ -30,6 +30,7 @@ use CNN recognize captcha by tensorflow.
 - <a href="#启动WebServer">2.6 启动WebServer</a>  
 - <a href="#调用接口">2.7 调用接口</a>  
 - <a href="#部署">2.8 部署</a>  
+- <a href="#部署">2.9 部署多个模型</a>  
 
 <a href="#说明">3 说明</a>  
 
@@ -96,10 +97,11 @@ use CNN recognize captcha by tensorflow.
 | 6 | recognition_object.py | 封装好的识别类 |
 | 7 | recognize_api.py | 使用flask写的提供在线识别功能的接口 |
 | 8 | recognize_online.py | 使用接口识别的例子 |
-| 9 | sample文件夹  | 存放数据集 |
-| 10 | model文件夹 | 存放模型文件 |
-| 11 | gen_image/gen_sample_by_captcha.py | 生成验证码的脚本 |
-| 12 | gen_image/collect_labels.py | 用于统计验证码标签（常用于中文验证码） |
+| 9 | recognize_local.py | 测试本地图片的例子 |
+| 10 | sample文件夹  | 存放数据集 |
+| 11 | model文件夹 | 存放模型文件 |
+| 12 | gen_image/gen_sample_by_captcha.py | 生成验证码的脚本 |
+| 13 | gen_image/collect_labels.py | 用于统计验证码标签（常用于中文验证码） |
 
 ## 1.3 依赖
 ```
@@ -250,16 +252,6 @@ python3 recognize_api.py
 ```
 接口url为`http://127.0.0.1:6000/b`
 
-部署多个模型:
-在`recognize_api.py`文件汇总，新建一个Recognizer对象，并参照原有`up_image`函数编写的路由和识别逻辑。
-```
-Q = Recognizer(image_height, image_width, max_captcha, char_set, model_save_dir)
-```
-注意修改这一行：
-```
-value = Q.rec_image(img)
-```
-
 ## 2.7 调用接口
 使用requests调用接口:
 ```
@@ -285,6 +277,18 @@ app.run(host='0.0.0.0',port=5000,debug=False)
 另外为了开启多进程处理请求，可以使用uwsgi+nginx组合进行部署。  
 这部分可以参考：[Flask部署选择](http://docs.jinkan.org/docs/flask/deploying/index.html)
 
+## 2.9 部署多个模型
+部署多个模型:
+在`recognize_api.py`文件汇总，新建一个Recognizer对象；  
+并参照原有`up_image`函数编写的路由和识别逻辑。
+```
+Q = Recognizer(image_height, image_width, max_captcha, char_set, model_save_dir)
+```
+注意修改这一行：
+```
+value = Q.rec_image(img)
+```
+
 # 3 说明
 1. 目前没有保存用于tensorboard的日志文件
 
@@ -301,3 +305,6 @@ tensorflow.python.framework.errors_impl.InvalidArgumentError: Unsuccessful Tenso
 由pycharm默认设置了工作空间，导致读取相对路径的model文件夹出错。
 解决办法：编辑运行配置，设置工作空间为项目目录即可。
 ![bug_api启动失败](readme_image/bug_api启动失败.png)
+
+2. FileNotFoundError: [Errno 2] No such file or directory: 'xxxxxx'
+目录下有文件夹不存在，在指定目录创建好文件夹即可。
