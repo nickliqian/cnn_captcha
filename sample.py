@@ -9,6 +9,7 @@ sample_conf.train_image_dir = "./sample/train/"
 sample_conf.test_image_dir = "./sample/test/"
 sample_conf.api_image_dir = "./sample/api/"
 sample_conf.online_image_dir = "./sample/online/"
+sample_conf.local_image_dir = "./sample/local/"
 
 # 模型文件夹
 sample_conf.model_save_dir = "./model/"
