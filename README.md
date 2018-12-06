@@ -11,6 +11,7 @@ use CNN recognize captcha by tensorflow.
 2018.11.21 - 加入关于验证码识别的一些说明  
 2018.11.24 - 优化校验数据集图片的规则  
 2018.11.26 - 新增`train_model_v2.py`文件，训练过程中同时输出训练集和验证集的准确率  
+2018.12.06 - 新增多模型部署支持，修复若干bug  
 
 
 # 目录
@@ -248,6 +249,16 @@ tb.test_batch()  # 开始验证
 python3 recognize_api.py
 ```
 接口url为`http://127.0.0.1:6000/b`
+
+部署多个模型:
+在`recognize_api.py`文件汇总，新建一个Recognizer对象，并参照原有`up_image`函数编写的路由和识别逻辑。
+```
+Q = Recognizer(image_height, image_width, max_captcha, char_set, model_save_dir)
+```
+注意修改这一行：
+```
+value = Q.rec_image(img)
+```
 
 ## 2.7 调用接口
 使用requests调用接口:
