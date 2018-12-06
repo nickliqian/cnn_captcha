@@ -37,6 +37,9 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 # 生成识别对象，需要配置参数
 R = Recognizer(image_height, image_width, max_captcha, char_set, model_save_dir)
 
+# 如果你需要使用多个模型，可以参照原有的例子配置路由和编写逻辑
+# Q = Recognizer(image_height, image_width, max_captcha, char_set, model_save_dir)
+
 
 def response_headers(content):
     resp = Response(content)
