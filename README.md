@@ -345,6 +345,8 @@ tensorflow.python.framework.errors_impl.InvalidArgumentError: Unsuccessful Tenso
 在迭代循环时，不能再包含任何张量的计算表达式，否在会内存溢出。
 将张量的计算表达式放到init初始化执行后，识别速度得到极大的提升。
 
-4. 怎样加载多个模型
+4. 加载多个模型报错
+原因是两个Recognizer对象都使用了默认的Graph。
+解决办法是在创建对象的时候不使用默认Graph，新建graph，这样每个Recognizer都使用不同的graph，就不会冲突了。
 
-4. Flask程序的并发运行
+5. Flask程序的并发运行
