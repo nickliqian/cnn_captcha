@@ -12,6 +12,7 @@ use CNN recognize captcha by tensorflow.
 2018.11.24 - 优化校验数据集图片的规则  
 2018.11.26 - 新增`train_model_v2.py`文件，训练过程中同时输出训练集和验证集的准确率  
 2018.12.06 - 新增多模型部署支持，修复若干bug  
+2018.12.08 - 优化模型识别速度，支持api压力测试和统计耗时    
 
 
 # 目录
@@ -31,6 +32,7 @@ use CNN recognize captcha by tensorflow.
 - <a href="#调用接口">2.7 调用接口</a>  
 - <a href="#部署">2.8 部署</a>  
 - <a href="#部署">2.9 部署多个模型</a>  
+- <a href="#部署">2.10 压力测试</a>  
 
 <a href="#说明">3 说明</a>  
 
@@ -86,22 +88,31 @@ use CNN recognize captcha by tensorflow.
 | PHP | mewebstudio/captcha | [文档](https://github.com/mewebstudio/captcha) |  |
 
 ## 1.2 目录结构
-
+### 1.2.1 基本配置
 | 序号 | 文件名称 | 说明 |
 | ------ | ------ | ------ |
 | 1 | sample.py | 配置文件 |
-| 2 | verify_and_split_data.py | 验证数据集和拆分数据为训练集和测试集 |
-| 3 | train_model.py | 训练模型 |
-| 4 | train_model_v2.py | 训练模型，训练过程中同时输出训练集和验证集的准确率，推荐使用此种方式训练 |
-| 5 | test_batch.py | 批量验证 |
-| 6 | recognition_object.py | 封装好的识别类 |
-| 7 | recognize_api.py | 使用flask写的提供在线识别功能的接口 |
-| 8 | recognize_online.py | 使用接口识别的例子 |
-| 9 | recognize_local.py | 测试本地图片的例子 |
-| 10 | sample文件夹  | 存放数据集 |
-| 11 | model文件夹 | 存放模型文件 |
-| 12 | gen_image/gen_sample_by_captcha.py | 生成验证码的脚本 |
-| 13 | gen_image/collect_labels.py | 用于统计验证码标签（常用于中文验证码） |
+| 2 | sample文件夹  | 存放数据集 |
+| 3 | model文件夹 | 存放模型文件 |
+### 1.2.2 训练模型
+| 序号 | 文件名称 | 说明 |
+| ------ | ------ | ------ |
+| 1 | verify_and_split_data.py | 验证数据集和拆分数据为训练集和测试集 |
+| 2 | train_model.py | 训练模型 |
+| 3 | train_model_v2.py | 训练模型，训练过程中同时输出训练集和验证集的准确率，推荐使用此种方式训练 |
+| 4 | test_batch.py | 批量验证 |
+| 5 | gen_image/gen_sample_by_captcha.py | 生成验证码的脚本 |
+| 6 | gen_image/collect_labels.py | 用于统计验证码标签（常用于中文验证码） |
+
+### 1.2.3 web接口
+
+| 序号 | 文件名称 | 说明 |
+| ------ | ------ | ------ |
+| 1 | recognition_object.py | 封装好的识别类 |
+| 2 | recognize_api.py | 使用flask写的提供在线识别功能的接口 |
+| 3 | recognize_online.py | 使用接口识别的例子 |
+| 4 | recognize_local.py | 测试本地图片的例子 |
+| 5 | recognize_time_test.py | 压力测试识别耗时和请求响应耗时 |
 
 ## 1.3 依赖
 ```
@@ -289,6 +300,16 @@ Q = Recognizer(image_height, image_width, max_captcha, char_set, model_save_dir)
 value = Q.rec_image(img)
 ```
 
+## 2.10 压力测试和统计数据
+提供了一个简易的压力测试脚本，可以统计api运行过程中识别耗时和请求耗时的相关数据，不过图需要自己用Excel拉出来。  
+打开文件`recognize_time_test.py`，修改`main`函数下的`test_file`路径，这里会重复使用一张图片来访问是被接口。  
+最后数据会储存在test.csv文件中。  
+使用如下命令运行：  
+```
+python3 recognize_time_test.py
+```
+把test.csv拖到Excel后可以生成图表（暂缺）。
+
 # 3 说明
 1. 目前没有保存用于tensorboard的日志文件
 
@@ -306,5 +327,14 @@ tensorflow.python.framework.errors_impl.InvalidArgumentError: Unsuccessful Tenso
 解决办法：编辑运行配置，设置工作空间为项目目录即可。
 ![bug_api启动失败](readme_image/bug_api启动失败.png)
 
-2. FileNotFoundError: [Errno 2] No such file or directory: 'xxxxxx'
+2. FileNotFoundError: [Errno 2] No such file or directory: 'xxxxxx'  
 目录下有文件夹不存在，在指定目录创建好文件夹即可。
+
+3. api程序在运行过程中内存越占越大  
+结果查阅资料：[链接](https://blog.csdn.net/The_lastest/article/details/81130500)  
+在迭代循环时，不能再包含任何张量的计算表达式，否在会内存溢出。
+将张量的计算表达式放到init初始化执行后，识别速度得到极大的提升。
+
+4. 怎样加载多个模型
+
+4. Flask程序的并发运行

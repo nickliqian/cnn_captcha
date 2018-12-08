@@ -57,7 +57,9 @@ def up_image():
         img = Image.open(img, mode="r")
         # username = request.form.get("name")
         print("接收图片尺寸: {}".format(img.size))
+        s = time.time()
         value = R.rec_image(img)
+        e = time.time()
         print("识别结果: {}".format(value))
         # 保存图片
         print("保存图片： {}{}_{}.{}".format(api_image_dir, value, timec, image_suffix))
@@ -65,8 +67,9 @@ def up_image():
         file_path = os.path.join(api_image_dir + file_name)
         img.save(file_path)
         result = {
-            'time': timec,
-            'value': value,
+            'time': timec,   # 时间戳
+            'value': value,  # 预测的结果
+            'speed_time(ms)': int((e - s) * 1000)  # 识别耗费的时间
         }
         return jsonify(result)
     else:

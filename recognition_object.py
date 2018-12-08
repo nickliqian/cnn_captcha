@@ -28,16 +28,18 @@ class Recognizer(object):
         self.g = tf.Graph()
         self.sess = tf.Session(graph=self.g)
         # 使用指定的图和会话
-        with self.sess.as_default():
-            with self.g.as_default():
-                # tf初始化占位符
-                self.X = tf.placeholder(tf.float32, [None, self.image_height * self.image_width])  # 特征向量
-                self.Y = tf.placeholder(tf.float32, [None, self.max_captcha * self.char_set_len])  # 标签
-                self.keep_prob = tf.placeholder(tf.float32)  # dropout值
-                # 加载网络和模型参数
-                self.y_predict = self.model()
-                saver = tf.train.Saver()
-                saver.restore(self.sess, self.model_save_dir)
+        with self.g.as_default():
+            # 迭代循环前，写出所有用到的张量的计算表达式，如果写在循环中，会发生内存泄漏，拖慢识别的速度
+            # tf初始化占位符
+            self.X = tf.placeholder(tf.float32, [None, self.image_height * self.image_width])  # 特征向量
+            self.Y = tf.placeholder(tf.float32, [None, self.max_captcha * self.char_set_len])  # 标签
+            self.keep_prob = tf.placeholder(tf.float32)  # dropout值
+            # 加载网络和模型参数
+            self.y_predict = self.model()
+            self.predict = tf.argmax(tf.reshape(self.y_predict, [-1, self.max_captcha, self.char_set_len]), 2)
+            saver = tf.train.Saver()
+            with self.sess.as_default() as sess:
+                saver.restore(sess, self.model_save_dir)
 
     # def __del__(self):
     #     self.sess.close()
@@ -120,22 +122,23 @@ class Recognizer(object):
         return y_predict
 
     def rec_image(self, img):
+        # 读取图片
+        img_array = np.array(img)
+        test_image = self.convert2gray(img_array)
+        test_image = test_image.flatten() / 255
         # 使用指定的图和会话
-        with self.sess.as_default():
-            with self.g.as_default():
-                img_array = np.array(img)
-                test_image = self.convert2gray(img_array)
-                test_image = test_image.flatten() / 255
+        with self.g.as_default():
+            with self.sess.as_default() as sess:
+                text_list = sess.run(self.predict, feed_dict={self.X: [test_image], self.keep_prob: 1.})
 
-                predict = tf.argmax(tf.reshape(self.y_predict, [-1, self.max_captcha, self.char_set_len]), 2)
-                text_list = self.sess.run(predict, feed_dict={self.X: [test_image], self.keep_prob: 1.})
-                predict_text = text_list[0].tolist()
-                p_text = ""
-                for p in predict_text:
-                    p_text += str(self.char_set[p])
+        # 获取结果
+        predict_text = text_list[0].tolist()
+        p_text = ""
+        for p in predict_text:
+            p_text += str(self.char_set[p])
 
-                # 返回识别结果
-                return p_text
+        # 返回识别结果
+        return p_text
 
 
 def main():
