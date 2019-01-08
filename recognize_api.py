@@ -71,6 +71,7 @@ def up_image():
             'value': value,  # 预测的结果
             'speed_time(ms)': int((e - s) * 1000)  # 识别耗费的时间
         }
+        img.close()
         return jsonify(result)
     else:
         content = json.dumps({"error_code": "1001"})
