@@ -209,7 +209,7 @@ class TrainModel(object):
         max_idx_l = tf.argmax(tf.reshape(self.Y, [-1, self.max_captcha, self.char_set_len]), 2)  # 标签
         # 计算准确率
         correct_pred = tf.equal(max_idx_p, max_idx_l)
-        accuracy = tf.reduce_mean(tf.cast(correct_pred, tf.float32))
+        accuracy = tf.reduce_mean(tf.reduce_min(tf.cast(correct_pred, tf.float32), axis=1))
         # 模型保存对象
         saver = tf.train.Saver()
         with tf.Session() as sess:
