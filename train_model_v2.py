@@ -231,7 +231,8 @@ class TrainModel(object):
         max_idx_l = tf.argmax(tf.reshape(self.Y, [-1, self.max_captcha, self.char_set_len]), 2)  # 标签
         # 计算准确率
         correct_pred = tf.equal(max_idx_p, max_idx_l)
-        accuracy = tf.reduce_mean(tf.reduce_min(tf.cast(correct_pred, tf.float32), axis=1))
+        accuracy_char_count = tf.reduce_mean(tf.cast(correct_pred, tf.float32))
+        accuracy_image_count = tf.reduce_mean(tf.reduce_min(tf.cast(correct_pred, tf.float32), axis=1))
         # 模型保存对象
         saver = tf.train.Saver()
         with tf.Session() as sess:
@@ -255,15 +256,17 @@ class TrainModel(object):
                 if step % 10 == 0:
                     # 基于训练集的测试
                     batch_x_test, batch_y_test = self.get_batch(i, size=100)
-                    acc = sess.run(accuracy, feed_dict={self.X: batch_x_test, self.Y: batch_y_test, self.keep_prob: 1.})
-                    print("第{}次训练 >>> [训练集] 准确率为 {} >>> loss {}".format(step, acc, cost_))
+                    acc_char = sess.run(accuracy_char_count, feed_dict={self.X: batch_x_test, self.Y: batch_y_test, self.keep_prob: 1.})
+                    acc_image = sess.run(accuracy_image_count, feed_dict={self.X: batch_x_test, self.Y: batch_y_test, self.keep_prob: 1.})
+                    print("第{}次训练 >>> ".format(step))
+                    print("[训练集] 字符准确率为 {:.5f} 图片准确率为 {:.5f} >>> loss {:.10f}".format(acc_char, acc_image, cost_))
                     # 基于验证集的测试
                     batch_x_verify, batch_y_verify = self.get_verify_batch(size=100)
-                    acc = sess.run(accuracy,
-                                   feed_dict={self.X: batch_x_verify, self.Y: batch_y_verify, self.keep_prob: 1.})
-                    print("            >>> [验证集] 准确率为 {} >>> loss {}".format(acc, cost_))
+                    acc_char = sess.run(accuracy_char_count, feed_dict={self.X: batch_x_verify, self.Y: batch_y_verify, self.keep_prob: 1.})
+                    acc_image = sess.run(accuracy_image_count, feed_dict={self.X: batch_x_verify, self.Y: batch_y_verify, self.keep_prob: 1.})
+                    print("[验证集] 字符准确率为 {:.5f} 图片准确率为 {:.5f} >>> loss {:.10f}".format(acc_char, acc_image, cost_))
                     # 准确率达到99%后保存并停止
-                    if acc > 0.99:
+                    if acc_image > 0.99:
                         saver.save(sess, self.model_save_dir)
                         print("验证集准确率达到99%，保存模型成功")
                         break
