@@ -221,7 +221,7 @@ class TrainModel(object):
                 try:
                     saver.restore(sess, self.model_save_dir)
                 # 判断捕获model文件夹中没有模型文件的错误
-                except NotFoundError:
+                except ValueError:
                     print("model文件夹为空，将创建新模型")
             else:
                 pass
