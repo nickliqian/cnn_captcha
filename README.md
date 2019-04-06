@@ -87,6 +87,7 @@ use CNN recognize captcha by tensorflow.
 | Java | SkewPassImage |  | ![效果1](./readme_image/SkewPassImage.jpg) |  
 | Java | Cage |  | ![效果1](./readme_image/Cage1.jpg) ![效果2](./readme_image/Cage2.jpg) |
 | Python | captcha | [例子](https://github.com/nickliqian/cnn_captcha/blob/master/gen_image/gen_sample_by_captcha.py) | ![py_Captcha](./readme_image/py_Captcha-1.jpg) |
+| Python | pycapt | [例子](https://github.com/aboutmydreams/pycapt) | ![pycapt](https://github.com/aboutmydreams/pycapt/raw/master/img/do4.png) |
 | PHP | Gregwar/Captcha | [文档](https://github.com/Gregwar/Captcha) |  |
 | PHP | mewebstudio/captcha | [文档](https://github.com/mewebstudio/captcha) |  |
 
