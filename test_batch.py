@@ -24,7 +24,7 @@ class TestBatch(CNN):
         random.shuffle(self.img_list)
 
         # 获得图片宽高和字符长度基本信息
-        label, captcha_array = self.gen_captcha_text_image(self.img_path, self.img_list[0])
+        label, captcha_array = self.gen_captcha_text_image()
 
         captcha_shape = captcha_array.shape
         captcha_shape_len = len(captcha_shape)
@@ -45,6 +45,21 @@ class TestBatch(CNN):
         print("-->验证码长度: {}".format(self.max_captcha))
         print("-->验证码共{}类 {}".format(self.char_set_len, char_set))
         print("-->使用测试集为 {}".format(img_path))
+
+    def gen_captcha_text_image(self):
+        """
+        返回一个验证码的array形式和对应的字符串标签
+        :return:tuple (str, numpy.array)
+        """
+        img_name = random.choice(self.img_list)
+        # 标签
+        label = img_name.split("_")[0]
+        # 文件
+        img_file = os.path.join(self.img_path, img_name)
+        captcha_image = Image.open(img_file)
+        captcha_array = np.array(captcha_image)  # 向量化
+
+        return label, captcha_array
 
     def test_batch(self):
         y_predict = self.model()

@@ -1,4 +1,6 @@
 # cnn_captcha
+**注意：dev分支目前是开发版本，没有经过完整的测试。**  
+
 use CNN recognize captcha by tensorflow.  
 本项目针对字符型图片验证码，使用tensorflow实现卷积神经网络，进行验证码识别。  
 项目封装了比较通用的**校验、训练、验证、识别、API模块**，极大的减少了识别字符型验证码花费的时间和精力。 
@@ -16,6 +18,10 @@ use CNN recognize captcha by tensorflow.
 2018.12.06 - 新增多模型部署支持，修复若干bug  
 2018.12.08 - 优化模型识别速度，支持api压力测试和统计耗时    
 2018.02.19 - 新增一种准确率计算方式    
+2019.04.09 - 更新如下：
+1. 只保留一种`train_model.py`文件  
+2. `sample.py`加入自定义训练轮数等参数
+3. 优化若干大家在issue提出的问题
 
 
 # 目录

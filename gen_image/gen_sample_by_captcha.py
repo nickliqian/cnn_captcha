@@ -8,35 +8,45 @@ import random
 import time
 
 
-def gen_special_img(text, file_path):
+def gen_special_img(text, file_path, width, height):
     # 生成img文件
     generator = ImageCaptcha(width=width, height=height)  # 指定大小
     img = generator.generate_image(text)  # 生成图片
     img.save(file_path)  # 保存图片
 
 
-if __name__ == '__main__':
+def gen_ima_by_batch(root_dir, image_suffix, characters, count, char_count, width, height):
+    # 判断文件夹是否存在
+    if not os.path.exists(root_dir):
+        os.makedirs(root_dir)
+
+    for index, i in enumerate(range(count)):
+        text = ""
+        for j in range(char_count):
+            text += random.choice(characters)
+
+        timec = str(time.time()).replace(".", "")
+        p = os.path.join(root_dir, "{}_{}.{}".format(text, timec, image_suffix))
+        gen_special_img(text, p, width, height)
+
+        print("Generate captcha image => {}".format(index + 1), end='\r')
+
+
+def main():
     # 配置参数
-    root_dir = "../sample/python_captcha/"  # 图片储存路径
+    root_dir = "../sample/origin/"  # 图片储存路径
     image_suffix = "png"  # 图片储存后缀
     characters = "0123456789"  # 图片上显示的字符集
     # characters = "0123456789abcdefghijklmnopqrstuvwxyz"
-    count = 100  # 生成多少张样本
+    count = 1000  # 生成多少张样本
     char_count = 4  # 图片上的字符数量
 
     # 设置图片高度和宽度
     width = 100
     height = 60
 
-    # 判断文件夹是否存在
-    if not os.path.exists(root_dir):
-        os.mkdir(root_dir)
+    gen_ima_by_batch(root_dir, image_suffix, characters, count, char_count, width, height)
 
-    for i in range(count):
-        text = ""
-        for j in range(char_count):
-            text += random.choice(characters)
-        timec = str(time.time()).replace(".", "")
-        p = os.path.join(root_dir, "{}_{}.{}".format(text, timec, image_suffix))
-        gen_special_img(text, p)
 
+if __name__ == '__main__':
+    main()

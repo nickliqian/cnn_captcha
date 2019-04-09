@@ -2,6 +2,7 @@ import tensorflow as tf
 import numpy as np
 import os
 from PIL import Image
+import random
 
 
 class CNN(object):
@@ -19,20 +20,6 @@ class CNN(object):
         self.X = tf.placeholder(tf.float32, [None, self.image_height * self.image_width])  # 特征向量
         self.Y = tf.placeholder(tf.float32, [None, self.max_captcha * self.char_set_len])  # 标签
         self.keep_prob = tf.placeholder(tf.float32)  # dropout值
-
-    @staticmethod
-    def gen_captcha_text_image(img_path, img_name):
-        """
-        返回一个验证码的array形式和对应的字符串标签
-        :return:tuple (str, numpy.array)
-        """
-        # 标签
-        label = img_name.split("_")[0]
-        # 文件
-        img_file = os.path.join(img_path, img_name)
-        captcha_image = Image.open(img_file)
-        captcha_array = np.array(captcha_image)  # 向量化
-        return label, captcha_array
 
     @staticmethod
     def convert2gray(img):

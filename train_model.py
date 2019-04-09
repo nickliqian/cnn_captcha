@@ -11,16 +11,17 @@ from tensorflow.python.framework.errors_impl import NotFoundError
 from network import CNN
 
 
-# 设置以下环境变量可开启CPU识别
-# os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-# os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
-
 class TrainError(Exception):
     pass
 
 
 class TrainModel(CNN):
-    def __init__(self, train_img_path, verify_img_path, char_set, model_save_dir, verify=False):
+    def __init__(self, train_img_path, verify_img_path, char_set, model_save_dir, cycle_stop, acc_stop, cycle_save, verify=False):
+        # 训练相关参数
+        self.cycle_stop = cycle_stop
+        self.acc_stop = acc_stop
+        self.cycle_save = cycle_save
+
         # 打乱文件顺序+校验图片格式
         self.train_img_path = train_img_path
         self.train_images_list = os.listdir(train_img_path)
@@ -63,6 +64,20 @@ class TrainModel(CNN):
         batch_x, batch_y = self.get_batch(0, size=100)
         print(">>> input batch images shape: {}".format(batch_x.shape))
         print(">>> input batch labels shape: {}".format(batch_y.shape))
+
+    @staticmethod
+    def gen_captcha_text_image(img_path, img_name):
+        """
+        返回一个验证码的array形式和对应的字符串标签
+        :return:tuple (str, numpy.array)
+        """
+        # 标签
+        label = img_name.split("_")[0]
+        # 文件
+        img_file = os.path.join(img_path, img_name)
+        captcha_image = Image.open(img_file)
+        captcha_array = np.array(captcha_image)  # 向量化
+        return label, captcha_array
 
     def get_batch(self, n, size=128):
         batch_x = np.zeros([size, self.image_height * self.image_width])  # 初始化
@@ -142,7 +157,7 @@ class TrainModel(CNN):
             else:
                 pass
             step = 1
-            for i in range(3000):
+            for i in range(self.cycle_stop):
                 batch_x, batch_y = self.get_batch(i, size=128)
                 # 梯度下降训练
                 _, cost_ = sess.run([optimizer, cost],
@@ -160,12 +175,12 @@ class TrainModel(CNN):
                     acc_image = sess.run(accuracy_image_count, feed_dict={self.X: batch_x_verify, self.Y: batch_y_verify, self.keep_prob: 1.})
                     print("[验证集] 字符准确率为 {:.5f} 图片准确率为 {:.5f} >>> loss {:.10f}".format(acc_char, acc_image, cost_))
                     # 准确率达到99%后保存并停止
-                    if acc_image > 0.99:
+                    if acc_image > self.acc_stop:
                         saver.save(sess, self.model_save_dir)
                         print("验证集准确率达到99%，保存模型成功")
                         break
                 # 每训练500轮就保存一次
-                if i % 500 == 0:
+                if i % self.cycle_save == 0:
                     saver.save(sess, self.model_save_dir)
                     print("定时保存模型成功")
                 step += 1
@@ -206,7 +221,17 @@ def main():
     verify_image_dir = sample_conf["test_image_dir"]
     char_set = sample_conf["char_set"]
     model_save_dir = sample_conf["model_save_dir"]
-    tm = TrainModel(train_image_dir, verify_image_dir, char_set, model_save_dir, verify=False)
+    cycle_stop = sample_conf["cycle_stop"]
+    acc_stop = sample_conf["acc_stop"]
+    cycle_save = sample_conf["cycle_save"]
+    enable_gpu = sample_conf["enable_gpu"]
+
+    if not enable_gpu:
+        # 设置以下环境变量可开启CPU识别
+        os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
+        os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+
+    tm = TrainModel(train_image_dir, verify_image_dir, char_set, model_save_dir, cycle_stop, acc_stop, cycle_save, verify=False)
     tm.train_cnn()  # 开始训练模型
     # tm.recognize_captcha()  # 识别图片示例
 

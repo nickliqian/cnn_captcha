@@ -39,3 +39,17 @@ if use_labels_json_file:
         pass
 
 sample_conf.remote_url = "https://www.xxxxx.com/getImg"
+
+# 训练相关参数
+# 到指定迭代次数后停止
+sample_conf.cycle_stop = 3000
+
+# 到指定准确率后停止
+sample_conf.acc_stop = 0.99
+
+# 每训练指定轮数就保存一次（覆盖之前的模型）
+sample_conf.cycle_save = 500
+
+# 使用GPU还是CPU
+# 使用GPU需要安装对应版本的tensorflow-gpu==1.7.0
+sample_conf.enable_gpu = 0
