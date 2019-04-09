@@ -1,0 +1,7 @@
+tensorflow==1.7.0
+flask==1.0.2
+requests==2.19.1
+Pillow==4.3.0
+matplotlib==2.1.0
+easydict==1.8
+numpy==1.16.2
