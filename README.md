@@ -108,8 +108,8 @@ use CNN recognize captcha by tensorflow.
 | 序号 | 文件名称 | 说明 |
 | ------ | ------ | ------ |
 | 1 | verify_and_split_data.py | 验证数据集和拆分数据为训练集和测试集 |
-| 2 | train_model.py | 训练模型 |
-| 3 | train_model_v2.py | 训练模型，训练过程中同时输出训练集和验证集的准确率，推荐使用此种方式训练 |
+| 2 | network.py | cnn网络基类 |
+| 3 | train_model.py | 训练模型，训练过程中同时输出训练集和验证集的准确率，推荐使用此种方式训练 |
 | 4 | test_batch.py | 批量验证 |
 | 5 | gen_image/gen_sample_by_captcha.py | 生成验证码的脚本 |
 | 6 | gen_image/collect_labels.py | 用于统计验证码标签（常用于中文验证码） |
@@ -359,4 +359,5 @@ tensorflow.python.framework.errors_impl.InvalidArgumentError: Unsuccessful Tenso
 原因是两个Recognizer对象都使用了默认的Graph。
 解决办法是在创建对象的时候不使用默认Graph，新建graph，这样每个Recognizer都使用不同的graph，就不会冲突了。
 
-5. Flask程序的并发运行
+5. Flask程序用于生产
+可以参考官方文档：[Flask的生产配置](http://docs.jinkan.org/docs/flask/config.html)
