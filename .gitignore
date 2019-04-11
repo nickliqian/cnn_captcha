@@ -111,3 +111,6 @@ sample/
 model/
 labels.json
 test.csv
+
+
+logs/

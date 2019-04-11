@@ -16,11 +16,13 @@ class TrainError(Exception):
 
 
 class TrainModel(CNN):
-    def __init__(self, train_img_path, verify_img_path, char_set, model_save_dir, cycle_stop, acc_stop, cycle_save, verify=False):
+    def __init__(self, train_img_path, verify_img_path, char_set, model_save_dir, cycle_stop, acc_stop, cycle_save, image_suffix, verify=False):
         # 训练相关参数
         self.cycle_stop = cycle_stop
         self.acc_stop = acc_stop
         self.cycle_save = cycle_save
+
+        self.image_suffix = image_suffix
         char_set = [str(i) for i in char_set]
 
         # 打乱文件顺序+校验图片格式
@@ -122,9 +124,9 @@ class TrainModel(CNN):
         print("开始校验所有图片后缀")
         for index, img_name in enumerate(self.train_images_list):
             print("{} image pass".format(index), end='\r')
-            if not img_name.endswith(sample_conf['image_suffix']):
+            if not img_name.endswith(self.image_suffix):
                 raise TrainError('confirm images suffix：you request [.{}] file but get file [{}]'
-                                 .format(sample_conf['image_suffix'], img_name))
+                                 .format(self.image_suffix, img_name))
         print("所有图片格式校验通过")
 
     def train_cnn(self):
@@ -132,17 +134,21 @@ class TrainModel(CNN):
         print(">>> input batch predict shape: {}".format(y_predict.shape))
         print(">>> End model test")
         # 计算概率 损失
-        cost = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=y_predict, labels=self.Y))
+        with tf.name_scope('cost'):
+            cost = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=y_predict, labels=self.Y))
         # 梯度下降
-        optimizer = tf.train.AdamOptimizer(learning_rate=0.0001).minimize(cost)
+        with tf.name_scope('train'):
+            optimizer = tf.train.AdamOptimizer(learning_rate=0.0001).minimize(cost)
         # 计算准确率
         predict = tf.reshape(y_predict, [-1, self.max_captcha, self.char_set_len])  # 预测结果
         max_idx_p = tf.argmax(predict, 2)  # 预测结果
         max_idx_l = tf.argmax(tf.reshape(self.Y, [-1, self.max_captcha, self.char_set_len]), 2)  # 标签
         # 计算准确率
         correct_pred = tf.equal(max_idx_p, max_idx_l)
-        accuracy_char_count = tf.reduce_mean(tf.cast(correct_pred, tf.float32))
-        accuracy_image_count = tf.reduce_mean(tf.reduce_min(tf.cast(correct_pred, tf.float32), axis=1))
+        with tf.name_scope('char_acc'):
+            accuracy_char_count = tf.reduce_mean(tf.cast(correct_pred, tf.float32))
+        with tf.name_scope('image_acc'):
+            accuracy_image_count = tf.reduce_mean(tf.reduce_min(tf.cast(correct_pred, tf.float32), axis=1))
         # 模型保存对象
         saver = tf.train.Saver()
         with tf.Session() as sess:
@@ -157,6 +163,9 @@ class TrainModel(CNN):
                     print("model文件夹为空，将创建新模型")
             else:
                 pass
+            # 写入日志
+            tf.summary.FileWriter("logs/", sess.graph)
+
             step = 1
             for i in range(self.cycle_stop):
                 batch_x, batch_y = self.get_batch(i, size=128)
@@ -229,13 +238,14 @@ def main():
     acc_stop = sample_conf["acc_stop"]
     cycle_save = sample_conf["cycle_save"]
     enable_gpu = sample_conf["enable_gpu"]
+    image_suffix = sample_conf['image_suffix']
 
     if not enable_gpu:
         # 设置以下环境变量可开启CPU识别
         os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
         os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
-    tm = TrainModel(train_image_dir, verify_image_dir, char_set, model_save_dir, cycle_stop, acc_stop, cycle_save, verify=False)
+    tm = TrainModel(train_image_dir, verify_image_dir, char_set, model_save_dir, cycle_stop, acc_stop, cycle_save, image_suffix, verify=False)
     tm.train_cnn()  # 开始训练模型
     # tm.recognize_captcha()  # 识别图片示例
 
