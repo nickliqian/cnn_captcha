@@ -12,7 +12,6 @@ from io import BytesIO
 import time
 import json
 import os
-from sample import sample_conf
 
 
 def recognize_captcha(test_path, save_path, image_suffix):
@@ -43,6 +42,9 @@ def recognize_captcha(test_path, save_path, image_suffix):
 
 
 def main():
+    with open("sample.json", "r") as f:
+        sample_conf = json.load(f)
+
     # 配置相关参数
     test_path = "sample/test/0401_15440848576253345.png"  # 测试识别的图片路径
     save_path = sample_conf["local_image_dir"]  # 保存的地址

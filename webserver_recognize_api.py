@@ -15,12 +15,13 @@ from lib.recognition_object import Recognizer
 import time
 from flask import Flask, request, jsonify, Response
 from PIL import Image
-from sample import sample_conf
 
 # 默认使用CPU
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
 os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
+with open("sample.json", "r") as f:
+    sample_conf = json.load(f)
 # 配置参数
 image_height = sample_conf["image_height"]
 image_width = sample_conf["image_width"]

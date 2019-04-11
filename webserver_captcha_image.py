@@ -13,6 +13,8 @@ import io
 # Flask对象
 app = Flask(__name__)
 basedir = os.path.abspath(os.path.dirname(__file__))
+
+
 with open("captcha_config.json", "r") as f:
     config = json.load(f)
 # 配置参数

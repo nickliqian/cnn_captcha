@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
+import json
+
 import tensorflow as tf
 import numpy as np
 import time
 from PIL import Image
 import random
 import os
-from sample import sample_conf
 from lib.network import CNN
 
 
@@ -94,6 +95,9 @@ class TestBatch(CNN):
 
 
 def main():
+    with open("sample.json", "r") as f:
+        sample_conf = json.load(f)
+
     test_image_dir = sample_conf["test_image_dir"]
     model_save_dir = sample_conf["model_save_dir"]
     char_set = sample_conf["char_set"]

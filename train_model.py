@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import json
+
 import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
@@ -6,7 +8,6 @@ import time
 from PIL import Image
 import random
 import os
-from sample import sample_conf
 from lib.network import CNN
 
 
@@ -20,6 +21,7 @@ class TrainModel(CNN):
         self.cycle_stop = cycle_stop
         self.acc_stop = acc_stop
         self.cycle_save = cycle_save
+        char_set = [str(i) for i in char_set]
 
         # 打乱文件顺序+校验图片格式
         self.train_img_path = train_img_path
@@ -216,6 +218,9 @@ class TrainModel(CNN):
 
 
 def main():
+    with open("sample.json", "r") as f:
+        sample_conf = json.load(f)
+
     train_image_dir = sample_conf["train_image_dir"]
     verify_image_dir = sample_conf["test_image_dir"]
     char_set = sample_conf["char_set"]

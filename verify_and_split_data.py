@@ -2,11 +2,12 @@
 验证图片尺寸和分离测试集（5%）和训练集（95%）
 初始化的时候使用，有新的图片后，可以把图片放在new目录里面使用。
 """
+import json
+
 from PIL import Image
 import random
 import os
 import shutil
-from sample import sample_conf
 
 
 def verify(origin_dir, real_width, real_height, image_suffix):
@@ -124,6 +125,9 @@ def split(origin_dir, train_dir, test_dir, bad_imgs):
 
 
 def main():
+    with open("sample.json", "r") as f:
+        sample_conf = json.load(f)
+
     # 图片路径
     origin_dir = sample_conf["origin_image_dir"]
     new_dir = sample_conf["new_image_dir"]
