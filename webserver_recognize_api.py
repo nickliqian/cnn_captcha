@@ -10,7 +10,7 @@
 import json
 from io import BytesIO
 import os
-from recognition_object import Recognizer
+from lib.recognition_object import Recognizer
 
 import time
 from flask import Flask, request, jsonify, Response
@@ -80,4 +80,8 @@ def up_image():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, port=6000)
+    app.run(
+        host='0.0.0.0',
+        port=6000,
+        debug=True
+    )

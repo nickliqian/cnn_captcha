@@ -6,6 +6,7 @@ from captcha.image import ImageCaptcha
 import os
 import random
 import time
+import json
 
 
 def gen_special_img(text, file_path, width, height):
@@ -33,17 +34,18 @@ def gen_ima_by_batch(root_dir, image_suffix, characters, count, char_count, widt
 
 
 def main():
+    with open("captcha_config.json", "r") as f:
+        config = json.load(f)
     # 配置参数
-    root_dir = "../sample/origin/"  # 图片储存路径
-    image_suffix = "png"  # 图片储存后缀
-    characters = "0123456789"  # 图片上显示的字符集
-    # characters = "0123456789abcdefghijklmnopqrstuvwxyz"
-    count = 1000  # 生成多少张样本
-    char_count = 4  # 图片上的字符数量
+    root_dir = config["root_dir"]  # 图片储存路径
+    image_suffix = config["image_suffix"]  # 图片储存后缀
+    characters = config["characters"]  # 图片上显示的字符集 # characters = "0123456789abcdefghijklmnopqrstuvwxyz"
+    count = config["count"]  # 生成多少张样本
+    char_count = config["char_count"]  # 图片上的字符数量
 
     # 设置图片高度和宽度
-    width = 100
-    height = 60
+    width = config["width"]
+    height = config["height"]
 
     gen_ima_by_batch(root_dir, image_suffix, characters, count, char_count, width, height)
 

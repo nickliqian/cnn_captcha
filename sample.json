@@ -49,7 +49,7 @@
         "z"
     ],
     "use_labels_json_file": false,
-    "remote_url": "https://www.xxxxx.com/getImg",
+    "remote_url": "http://127.0.0.1:6100/captcha/",
     "cycle_stop": 3000,
     "acc_stop": 0.99,
     "cycle_save": 500,

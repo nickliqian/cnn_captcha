@@ -5,6 +5,7 @@ sample_conf = EasyDict()
 
 # 图片文件夹
 sample_conf.origin_image_dir = "./sample/origin/"
+sample_conf.new_image_dir = "./sample/new/"
 sample_conf.train_image_dir = "./sample/train/"
 sample_conf.test_image_dir = "./sample/test/"
 sample_conf.api_image_dir = "./sample/api/"
@@ -28,8 +29,8 @@ sample_conf.char_set = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', '
 
 use_labels_json_file = False
 if use_labels_json_file:
-    if os.path.exists("gen_image/labels.json"):
-        with open("gen_image/labels.json", "r") as f:
+    if os.path.exists("tools/labels.json"):
+        with open("tools/labels.json", "r") as f:
             content = f.read()
             if content:
                 sample_conf.char_set = json.loads(content)
@@ -38,7 +39,7 @@ if use_labels_json_file:
     else:
         pass
 
-sample_conf.remote_url = "https://www.xxxxx.com/getImg"
+sample_conf.remote_url = "http://127.0.0.1:6100/captcha/"
 
 # 训练相关参数
 # 到指定迭代次数后停止

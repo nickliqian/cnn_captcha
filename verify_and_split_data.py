@@ -1,5 +1,6 @@
 """
 验证图片尺寸和分离测试集（5%）和训练集（95%）
+初始化的时候使用，有新的图片后，可以把图片放在new目录里面使用。
 """
 from PIL import Image
 import random
@@ -13,6 +14,10 @@ def verify(origin_dir, real_width, real_height, image_suffix):
     校验图片大小
     :return:
     """
+    if not os.path.exists(origin_dir):
+        print("【警告】找不到目录{}，即将创建".format(origin_dir))
+        os.makedirs(origin_dir)
+
     print("开始校验原始图片集")
     # 图片真实尺寸
     real_size = (real_width, real_height)
@@ -57,7 +62,7 @@ def verify(origin_dir, real_width, real_height, image_suffix):
             print("[第{}张图片] [{}] [{}]".format(b[0], b[1], b[2]))
     else:
         print("未发现异常（共 {} 张图片）".format(len(img_list)))
-    print("========end\n")
+    print("========end")
     return bad_img
 
 
@@ -66,6 +71,10 @@ def split(origin_dir, train_dir, test_dir, bad_imgs):
     分离训练集和测试集
     :return:
     """
+    if not os.path.exists(origin_dir):
+        print("【警告】找不到目录{}，即将创建".format(origin_dir))
+        os.makedirs(origin_dir)
+
     print("开始分离原始图片集为：测试集（5%）和训练集（95%）")
 
     # 图片名称列表和数量
@@ -117,6 +126,7 @@ def split(origin_dir, train_dir, test_dir, bad_imgs):
 def main():
     # 图片路径
     origin_dir = sample_conf["origin_image_dir"]
+    new_dir = sample_conf["new_image_dir"]
     train_dir = sample_conf["train_image_dir"]
     test_dir = sample_conf["test_image_dir"]
     # 图片尺寸
@@ -125,11 +135,13 @@ def main():
     # 图片后缀
     image_suffix = sample_conf["image_suffix"]
 
-    bad_images_info = verify(origin_dir, real_width, real_height, image_suffix)
-    bad_imgs = []
-    for info in bad_images_info:
-        bad_imgs.append(info[1])
-    split(origin_dir, train_dir, test_dir, bad_imgs)
+    for image_dir in [origin_dir, new_dir]:
+        print(">>> 开始校验目录：[{}]".format(image_dir))
+        bad_images_info = verify(image_dir, real_width, real_height, image_suffix)
+        bad_imgs = []
+        for info in bad_images_info:
+            bad_imgs.append(info[1])
+        split(image_dir, train_dir, test_dir, bad_imgs)
 
 
 if __name__ == '__main__':

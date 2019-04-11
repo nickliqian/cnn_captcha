@@ -6,7 +6,7 @@ from PIL import Image
 import random
 import os
 from sample import sample_conf
-from network import CNN
+from lib.network import CNN
 
 
 class TestError(Exception):

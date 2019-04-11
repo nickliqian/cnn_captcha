@@ -7,8 +7,7 @@ from PIL import Image
 import random
 import os
 from sample import sample_conf
-from tensorflow.python.framework.errors_impl import NotFoundError
-from network import CNN
+from lib.network import CNN
 
 
 class TrainError(Exception):
