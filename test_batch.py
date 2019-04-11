@@ -95,7 +95,7 @@ class TestBatch(CNN):
 
 
 def main():
-    with open("sample.json", "r") as f:
+    with open("conf/sample_config.json", "r") as f:
         sample_conf = json.load(f)
 
     test_image_dir = sample_conf["test_image_dir"]

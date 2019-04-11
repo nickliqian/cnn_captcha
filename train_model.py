@@ -218,7 +218,7 @@ class TrainModel(CNN):
 
 
 def main():
-    with open("sample.json", "r") as f:
+    with open("conf/sample_config.json", "r") as f:
         sample_conf = json.load(f)
 
     train_image_dir = sample_conf["train_image_dir"]

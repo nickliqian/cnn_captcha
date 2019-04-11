@@ -42,7 +42,7 @@ def recognize_captcha(test_path, save_path, image_suffix):
 
 
 def main():
-    with open("sample.json", "r") as f:
+    with open("conf/sample_config.json", "r") as f:
         sample_conf = json.load(f)
 
     # 配置相关参数

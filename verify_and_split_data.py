@@ -125,7 +125,7 @@ def split(origin_dir, train_dir, test_dir, bad_imgs):
 
 
 def main():
-    with open("sample.json", "r") as f:
+    with open("conf/sample_config.json", "r") as f:
         sample_conf = json.load(f)
 
     # 图片路径

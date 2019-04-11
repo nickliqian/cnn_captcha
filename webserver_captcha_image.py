@@ -15,7 +15,7 @@ app = Flask(__name__)
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 
-with open("captcha_config.json", "r") as f:
+with open("conf/captcha_config.json", "r") as f:
     config = json.load(f)
 # 配置参数
 root_dir = config["root_dir"]  # 图片储存路径

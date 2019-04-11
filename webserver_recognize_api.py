@@ -20,7 +20,7 @@ from PIL import Image
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
 os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
-with open("sample.json", "r") as f:
+with open("conf/sample_config.json", "r") as f:
     sample_conf = json.load(f)
 # 配置参数
 image_height = sample_conf["image_height"]
