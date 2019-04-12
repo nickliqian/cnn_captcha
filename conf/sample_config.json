@@ -1,6 +1,7 @@
 {
   "origin_image_dir": "sample/origin/",
   "train_image_dir": "sample/train/",
+  "new_image_dir": "sample/new/",
   "test_image_dir": "sample/test/",
   "api_image_dir": "sample/api/",
   "online_image_dir": "sample/online/",
@@ -11,10 +12,10 @@
   "max_captcha": 4,
   "image_suffix": "png",
   "char_set": "0123456789abcdefghijklmnopqrstuvwxyz",
-  "use_labels_json_file": false,
+  "use_labels_json_file": true,
   "remote_url": "http://127.0.0.1:6100/captcha/",
   "cycle_stop": 3000,
   "acc_stop": 0.99,
   "cycle_save": 500,
-  "enable_gpu": 0
+  "enable_gpu": 1
 }

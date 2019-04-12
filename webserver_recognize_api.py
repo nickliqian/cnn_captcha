@@ -29,7 +29,13 @@ max_captcha = sample_conf["max_captcha"]
 api_image_dir = sample_conf["api_image_dir"]
 model_save_dir = sample_conf["model_save_dir"]
 image_suffix = sample_conf["image_suffix"]  # 文件后缀
-char_set = sample_conf["char_set"]
+use_labels_json_file = sample_conf['use_labels_json_file']
+
+if use_labels_json_file:
+    with open("tools/labels.json", "r") as f:
+        char_set = f.read().strip()
+else:
+    char_set = sample_conf["char_set"]
 
 # Flask对象
 app = Flask(__name__)

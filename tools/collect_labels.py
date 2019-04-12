@@ -24,6 +24,6 @@ for img in image_list:
 print("共有标签{}种".format(len(labels)))
 
 with open("./labels.json", "w") as f:
-    f.write(json.dumps(list(labels), ensure_ascii=False))
+    f.write(json.dumps("".join(list(labels)), ensure_ascii=False))
 
 print("将标签列表写入文件labels.json成功")

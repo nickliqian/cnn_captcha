@@ -100,7 +100,15 @@ def main():
 
     test_image_dir = sample_conf["test_image_dir"]
     model_save_dir = sample_conf["model_save_dir"]
-    char_set = sample_conf["char_set"]
+
+    use_labels_json_file = sample_conf['use_labels_json_file']
+
+    if use_labels_json_file:
+        with open("tools/labels.json", "r") as f:
+            char_set = f.read().strip()
+    else:
+        char_set = sample_conf["char_set"]
+
     total = 100
     tb = TestBatch(test_image_dir, char_set, model_save_dir, total)
     tb.test_batch()

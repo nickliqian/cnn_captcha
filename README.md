@@ -11,17 +11,28 @@ use CNN recognize captcha by tensorflow.
 如果你需要识别点选、拖拽类验证码，或者有目标检测需求，也可以参考这个项目[nickliqian/darknet_captcha](https://github.com/nickliqian/darknet_captcha)。
 
 # 时间表
-2018.11.12 - 初版Readme.md  
-2018.11.21 - 加入关于验证码识别的一些说明  
-2018.11.24 - 优化校验数据集图片的规则  
-2018.11.26 - 新增`train_model_v2.py`文件，训练过程中同时输出训练集和验证集的准确率  
-2018.12.06 - 新增多模型部署支持，修复若干bug  
-2018.12.08 - 优化模型识别速度，支持api压力测试和统计耗时    
-2018.02.19 - 新增一种准确率计算方式    
-2019.04.09 - 更新如下：
-1. 只保留一种`train_model.py`文件  
-2. `sample.py`加入自定义训练轮数等参数
-3. 优化若干大家在issue提出的问题
+#### 2018.11.12
+初版Readme.md  
+#### 2018.11.21
+加入关于验证码识别的一些说明  
+#### 2018.11.24
+优化校验数据集图片的规则  
+#### 2018.11.26
+新增`train_model_v2.py`文件，训练过程中同时输出训练集和验证集的准确率  
+#### 2018.12.06
+新增多模型部署支持，修复若干bug  
+#### 2018.12.08
+优化模型识别速度，支持api压力测试和统计耗时  
+#### 2019.02.19
+1. 新增一种准确率计算方式    
+2. TAG: v1.0
+#### 2019.04.12
+1. 只保留一种`train_model.py`文件
+2. 优化代码结构
+3. 把通用配置抽取到`sample_config.json`和`captcha_config.json`
+4. 修复若干大家在issue提出的问题
+5. 更新`readme.md`
+6. TAG: v2.0  
 
 
 # 目录
@@ -101,33 +112,33 @@ use CNN recognize captcha by tensorflow.
 ### 1.2.1 基本配置
 | 序号 | 文件名称 | 说明 |
 | ------ | ------ | ------ |
-| 1 | sample.py | 配置文件 |
-| 2 | sample文件夹  | 存放数据集 |
-| 3 | model文件夹 | 存放模型文件 |
+| 1 | `conf/` | 配置文件目录 |
+| 2 | `sample/` | 数据集目录 |
+| 3 | `model/` | 模型文件目录 |
 ### 1.2.2 训练模型
 | 序号 | 文件名称 | 说明 |
 | ------ | ------ | ------ |
-| 1 | verify_and_split_data.py | 验证数据集和拆分数据为训练集和测试集 |
+| 1 | verify_and_split_data.py | 验证数据集、拆分数据为训练集和测试集 |
 | 2 | network.py | cnn网络基类 |
-| 3 | train_model.py | 训练模型，训练过程中同时输出训练集和验证集的准确率，推荐使用此种方式训练 |
+| 3 | train_model.py | 训练模型 |
 | 4 | test_batch.py | 批量验证 |
-| 5 | gen_image/gen_sample_by_captcha.py | 生成验证码的脚本 |
-| 6 | gen_image/collect_labels.py | 用于统计验证码标签（常用于中文验证码） |
+| 5 | gen_sample_by_captcha.py | 生成验证码的脚本 |
+| 6 | tools/collect_labels.py | 用于统计验证码标签（常用于中文验证码） |
 
 ### 1.2.3 web接口
-
 | 序号 | 文件名称 | 说明 |
 | ------ | ------ | ------ |
-| 1 | recognition_object.py | 封装好的识别类 |
-| 2 | recognize_api.py | 使用flask写的提供在线识别功能的接口 |
+| 1 | webserver_captcha_image.py | 获取验证码接口 |
+| 2 | webserver_recognize_api.py | 提供在线识别验证码接口 |
 | 3 | recognize_online.py | 使用接口识别的例子 |
 | 4 | recognize_local.py | 测试本地图片的例子 |
 | 5 | recognize_time_test.py | 压力测试识别耗时和请求响应耗时 |
 
 ## 1.3 依赖
 ```
-pip3 install tensorflow==1.7.0 flask==1.0.2 requests==2.19.1 Pillow==4.3.0 matplotlib==2.1.0 easydict==1.8
+pip3 install -r requirements.txt
 ```
+如果使用GPU训练，请安装`tensorflow-gpu==1.7.0`。
 ## 1.4 模型结构
 
 | 序号 | 层级 |
@@ -149,35 +160,50 @@ pip3 install tensorflow==1.7.0 flask==1.0.2 requests==2.19.1 Pillow==4.3.0 matpl
 生成之前你需要修改相关配置（路径、文件后缀、字符集等）。
 
 ## 2.2 配置文件
-创建一个新项目前，需要自行**修改相关配置文件**
-```
+创建一个新项目前，需要自行**修改配置文件**`conf/sample_config.json`。  
 图片文件夹
-sample_conf.origin_image_dir = "./sample/origin/"  # 原始文件
-sample_conf.train_image_dir = "./sample/train/"   # 训练集
-sample_conf.test_image_dir = "./sample/test/"   # 测试集
-sample_conf.api_image_dir = "./sample/api/"   # api接收的图片储存路径
-sample_conf.online_image_dir = "./sample/online/"  # 从验证码url获取的图片的储存路径
-
-# 模型文件夹
-sample_conf.model_save_dir = "./model/"  # 训练好的模型储存路径
-
-# 图片相关参数
-sample_conf.image_width = 80  # 图片宽度
-sample_conf.image_height = 40  # 图片高度
-sample_conf.max_captcha = 4  # 验证码字符个数
-sample_conf.image_suffix = "jpg"  # 图片文件后缀
-
-# 验证码字符相关参数
-# 验证码识别结果类别
-sample_conf.char_set = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',
-                        'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
-
-# 验证码远程链接
-sample_conf.remote_url = "https://www.xxxxx.com/getImg"
 ```
-具体配置的作用会在使用相关脚本的过程中提到
-关于`验证码识别结果类别`，假设你的样本是中文验证码，你可以使用`gen_image/collect_labels.py`脚本进行标签的统计。
-会生成文件`gen_image/labels.json`存放所有标签，在配置文件中设置`use_labels_json_file = True`开启读取`labels.json`内容作为`结果类别`。
+origin_image_dir = "./sample/origin/"  # 原始文件
+train_image_dir = "./sample/train/"   # 训练集
+test_image_dir = "./sample/test/"   # 测试集
+api_image_dir = "./sample/api/"   # api接收的图片储存路径
+online_image_dir = "./sample/online/"  # 从验证码url获取的图片的储存路径
+```
+模型文件夹
+```
+model_save_dir = "./model/"  # 训练好的模型储存路径
+```
+图片相关参数
+```
+image_width = 80  # 图片宽度
+image_height = 40  # 图片高度
+max_captcha = 4  # 验证码字符个数
+image_suffix = "jpg"  # 图片文件后缀
+```
+是否从文件中的导入标签
+```
+use_labels_json_file = False
+```
+验证码字符相关参数
+```
+char_set = "0123456789abcdefghijklmnopqrstuvwxyz"
+char_set = "abcdefghijklmnopqrstuvwxyz"
+char_set = "0123456789"
+```
+在线识别远程验证码地址
+```
+remote_url = "http://127.0.0.1:6100/captcha/"
+```
+训练相关参数
+```
+cycle_stop = 3000  # 到指定迭代次数后停止
+acc_stop = 0.99  # 到指定准确率后停止
+cycle_save = 500  # 每训练指定轮数就保存一次（覆盖之前的模型）
+enable_gpu = 0  # 使用GPU还是CPU,使用GPU需要安装对应版本的tensorflow-gpu==1.7.0
+```
+具体配置的作用会在使用相关脚本的过程中提到。  
+关于`验证码识别结果类别`，假设你的样本是中文验证码，你可以使用`tools/collect_labels.py`脚本进行标签的统计。
+会生成文件`tools/labels.json`存放所有标签，在配置文件中设置`use_labels_json_file = true`开启读取`labels.json`内容作为`结果类别`。
 
 ## 2.3 验证和拆分数据集
 此功能会校验原始图片集的尺寸和测试图片是否能打开，并按照19:1的比例拆分出训练集和测试集。  
@@ -203,6 +229,8 @@ Total image count: 10094
 训练集数量为：9586
 ```
 
+此外，当你有新的样本需要一起训练，可以放在`sample/new`目录下，再次运行`python3 verify_and_split_data.py`即可。  
+需要注意的是，如果新的样本中有新增的标签，你需要把新的标签增加到`char_set`配置中或者`labels.json`文件中。  
 ## 2.4 训练模型
 创建好训练集和测试集之后，就可以开始训练模型了。  
 训练的过程中会输出日志，日志展示当前的训练轮数、准确率和loss。  

@@ -232,13 +232,19 @@ def main():
 
     train_image_dir = sample_conf["train_image_dir"]
     verify_image_dir = sample_conf["test_image_dir"]
-    char_set = sample_conf["char_set"]
     model_save_dir = sample_conf["model_save_dir"]
     cycle_stop = sample_conf["cycle_stop"]
     acc_stop = sample_conf["acc_stop"]
     cycle_save = sample_conf["cycle_save"]
     enable_gpu = sample_conf["enable_gpu"]
     image_suffix = sample_conf['image_suffix']
+    use_labels_json_file = sample_conf['use_labels_json_file']
+
+    if use_labels_json_file:
+        with open("tools/labels.json", "r") as f:
+            char_set = f.read().strip()
+    else:
+        char_set = sample_conf["char_set"]
 
     if not enable_gpu:
         # 设置以下环境变量可开启CPU识别

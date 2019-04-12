@@ -30,7 +30,7 @@ def gen_ima_by_batch(root_dir, image_suffix, characters, count, char_count, widt
         p = os.path.join(root_dir, "{}_{}.{}".format(text, timec, image_suffix))
         gen_special_img(text, p, width, height)
 
-        print("Generate captcha image => {}".format(index + 1), end='\r')
+        print("Generate captcha image => {}".format(index + 1))
 
 
 def main():
