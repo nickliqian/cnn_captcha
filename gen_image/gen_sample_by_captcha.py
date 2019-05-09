@@ -30,7 +30,7 @@ if __name__ == '__main__':
 
     # 判断文件夹是否存在
     if not os.path.exists(root_dir):
-        os.mkdir(root_dir)
+        os.makedirs(root_dir)
 
     for i in range(count):
         text = ""
