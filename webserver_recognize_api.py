@@ -10,7 +10,7 @@
 import json
 from io import BytesIO
 import os
-from lib.recognition_object import Recognizer
+from cnnlib.recognition_object import Recognizer
 
 import time
 from flask import Flask, request, jsonify, Response

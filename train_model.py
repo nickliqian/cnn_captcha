@@ -8,7 +8,7 @@ import time
 from PIL import Image
 import random
 import os
-from lib.network import CNN
+from cnnlib.network import CNN
 
 
 class TrainError(Exception):
