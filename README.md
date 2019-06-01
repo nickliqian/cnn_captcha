@@ -122,8 +122,8 @@ use CNN recognize captcha by tensorflow.
 | 2 | network.py | cnn网络基类 |
 | 3 | train_model.py | 训练模型 |
 | 4 | test_batch.py | 批量验证 |
-| 5 | gen_sample_by_captcha.py | 生成验证码的脚本 |
-| 6 | tools/collect_labels.py | 用于统计验证码标签（常用于中文验证码） |
+| 5 | gen_image/gen_sample_by_captcha.py | 生成验证码的脚本 |
+| 6 | gen_image/collect_labels.py | 用于统计验证码标签（常用于中文验证码） |
 
 ### 1.2.3 web接口
 | 序号 | 文件名称 | 说明 |
@@ -136,9 +136,10 @@ use CNN recognize captcha by tensorflow.
 
 ## 1.3 依赖
 ```
-pip3 install -r requirements.txt
+pip install -r requirements.txt
 ```
-如果使用GPU训练，请安装`tensorflow-gpu==1.7.0`。
+注意：如果需要使用GPU进行训练，请把文件中的tenforflow修改为tensorflow-gpu
+
 ## 1.4 模型结构
 
 | 序号 | 层级 |
@@ -153,57 +154,51 @@ pip3 install -r requirements.txt
 
 # 2 如何使用
 ## 2.1 数据集
-原始数据集可以存放在`./sample/origin`目录中  
-为了便于处理，图片最好以`2e8j_17322d3d4226f0b5c5a71d797d2ba7f7.jpg`格式命名（标签_序列号.后缀） 
+原始数据集可以存放在`./sample/origin`目录中。  
+为了便于处理，图片最好以`2e8j_17322d3d4226f0b5c5a71d797d2ba7f7.jpg`格式命名（标签_序列号.后缀）。 
   
 如果你没有训练集，你可以使用`gen_sample_by_captcha.py`文件生成训练集文件。
-生成之前你需要修改相关配置（路径、文件后缀、字符集等）。
+生成之前你需要修改相关配置`conf/sample_config.json`（路径、文件后缀、字符集等）。
+```
+{
+  "root_dir": "sample/origin/",  # 验证码保存路径
+  "image_suffix": "png",         # 验证码图片后缀
+  "characters": "0123456789",    # 生成验证码的可选字符
+  "count": 1000,                 # 生成验证码的图片数量
+  "char_count": 4,               # 每张验证码图片上的字符数量
+  "width": 100,                  # 图片宽度
+  "height": 60                   # 图片高度
+}
+```
 
 ## 2.2 配置文件
-创建一个新项目前，需要自行**修改配置文件**`conf/sample_config.json`。  
-图片文件夹
+创建一个新项目前，需要自行**修改相关配置文件**`conf/sample_config.json`。
 ```
-origin_image_dir = "./sample/origin/"  # 原始文件
-train_image_dir = "./sample/train/"   # 训练集
-test_image_dir = "./sample/test/"   # 测试集
-api_image_dir = "./sample/api/"   # api接收的图片储存路径
-online_image_dir = "./sample/online/"  # 从验证码url获取的图片的储存路径
+{
+  "origin_image_dir": "sample/origin/",  # 原始文件
+  "new_image_dir": "sample/new_train/",  # 新的训练样本
+  "train_image_dir": "sample/train/",    # 训练集
+  "test_image_dir": "sample/test/",      # 测试集
+  "api_image_dir": "sample/api/",        # api接收的图片储存路径
+  "online_image_dir": "sample/online/",  # 从验证码url获取的图片的储存路径
+  "local_image_dir": "sample/local/",    # 本地保存图片的路径
+  "model_save_dir": "model/",            # 从验证码url获取的图片的储存路径
+  "image_width": 100,                    # 图片宽度
+  "image_height": 60,                    # 图片高度
+  "max_captcha": 4,                      # 验证码字符个数
+  "image_suffix": "png",                 # 图片文件后缀
+  "char_set": "0123456789abcdefghijklmnopqrstuvwxyz",  # 验证码识别结果类别
+  "use_labels_json_file": false,                       # 是否开启读取`labels.json`内容
+  "remote_url": "http://127.0.0.1:6100/captcha/",      # 验证码远程获取地址
+  "cycle_stop": 3000,                                  # 启动任务后的训练指定次数后停止
+  "acc_stop": 0.99,                                    # 训练到指定准确率后停止
+  "cycle_save": 500,                                   # 训练指定次数后定时保存模型
+  "enable_gpu": 0                                      # 是否开启GUP训练
+}
+
 ```
-模型文件夹
-```
-model_save_dir = "./model/"  # 训练好的模型储存路径
-```
-图片相关参数
-```
-image_width = 80  # 图片宽度
-image_height = 40  # 图片高度
-max_captcha = 4  # 验证码字符个数
-image_suffix = "jpg"  # 图片文件后缀
-```
-是否从文件中的导入标签
-```
-use_labels_json_file = False
-```
-验证码字符相关参数
-```
-char_set = "0123456789abcdefghijklmnopqrstuvwxyz"
-char_set = "abcdefghijklmnopqrstuvwxyz"
-char_set = "0123456789"
-```
-在线识别远程验证码地址
-```
-remote_url = "http://127.0.0.1:6100/captcha/"
-```
-训练相关参数
-```
-cycle_stop = 3000  # 到指定迭代次数后停止
-acc_stop = 0.99  # 到指定准确率后停止
-cycle_save = 500  # 每训练指定轮数就保存一次（覆盖之前的模型）
-enable_gpu = 0  # 使用GPU还是CPU,使用GPU需要安装对应版本的tensorflow-gpu==1.7.0
-```
-具体配置的作用会在使用相关脚本的过程中提到。  
 关于`验证码识别结果类别`，假设你的样本是中文验证码，你可以使用`tools/collect_labels.py`脚本进行标签的统计。
-会生成文件`tools/labels.json`存放所有标签，在配置文件中设置`use_labels_json_file = true`开启读取`labels.json`内容作为`结果类别`。
+会生成文件`gen_image/labels.json`存放所有标签，在配置文件中设置`use_labels_json_file = True`开启读取`labels.json`内容作为`结果类别`。
 
 ## 2.3 验证和拆分数据集
 此功能会校验原始图片集的尺寸和测试图片是否能打开，并按照19:1的比例拆分出训练集和测试集。  
@@ -215,19 +210,31 @@ enable_gpu = 0  # 使用GPU还是CPU,使用GPU需要安装对应版本的tensorf
 python3 verify_and_split_data.py
 ```
 一般会有类似下面的提示
-```开始校验原始图片集
-Total image count: 10094
-====以下4张图片有异常====
-[第2123张图片] [325.txt] [文件后缀不正确]
-[第3515张图片] [_15355300508855503.gif] [图片标签异常]
-[第6413张图片] [qwer_15355300721958663.gif] [图片尺寸异常为：(50, 50)]
-[第9437张图片] [abcd_15355300466073782.gif] [图片无法正常打开]
+```
+>>> 开始校验目录：[sample/origin/]
+开始校验原始图片集
+原始集共有图片: 1001张
+====以下1张图片有异常====
+[第0张图片] [.DStore] [文件后缀不正确]
 ========end
 开始分离原始图片集为：测试集（5%）和训练集（95%）
-共分配10090张图片到训练集和测试集，其中4张为异常留在原始目录
-测试集数量为：504
-训练集数量为：9586
+共分配1000张图片到训练集和测试集，其中1张为异常留在原始目录
+测试集数量为：50
+训练集数量为：950
+>>> 开始校验目录：[sample/new_train/]
+【警告】找不到目录sample/new_train/，即将创建
+开始校验原始图片集
+原始集共有图片: 0张
+====以下0张图片有异常====
+未发现异常（共 0 张图片）
+========end
+开始分离原始图片集为：测试集（5%）和训练集（95%）
+共分配0张图片到训练集和测试集，其中0张为异常留在原始目录
+测试集数量为：0
+训练集数量为：0
 ```
+程序会同时校验和分割`origin_image_dir`和`new_image_dir`两个目录中的图片；后续有了更多的样本，可以把样本放在`new_image_dir`目录中再次执行`verify_and_split_data`。  
+程序会把无效的文件留在原文件夹。  
 
 此外，当你有新的样本需要一起训练，可以放在`sample/new`目录下，再次运行`python3 verify_and_split_data.py`即可。  
 需要注意的是，如果新的样本中有新增的标签，你需要把新的标签增加到`char_set`配置中或者`labels.json`文件中。  

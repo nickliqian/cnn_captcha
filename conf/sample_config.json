@@ -1,5 +1,6 @@
 {
   "origin_image_dir": "sample/origin/",
+  "new_image_dir": "sample/new_train/",
   "train_image_dir": "sample/train/",
   "new_image_dir": "sample/new/",
   "test_image_dir": "sample/test/",
