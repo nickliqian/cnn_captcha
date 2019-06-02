@@ -2,7 +2,7 @@
   "root_dir": "sample/origin/",
   "image_suffix": "png",
   "characters": "0123456789abcdefghijklmnopqrstuvwxyz",
-  "count": 1000,
+  "count": 20000,
   "char_count": 4,
   "width": 100,
   "height": 60

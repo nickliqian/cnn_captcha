@@ -179,11 +179,19 @@ class TrainModel(CNN):
                     acc_image = sess.run(accuracy_image_count, feed_dict={self.X: batch_x_test, self.Y: batch_y_test, self.keep_prob: 1.})
                     print("第{}次训练 >>> ".format(step))
                     print("[训练集] 字符准确率为 {:.5f} 图片准确率为 {:.5f} >>> loss {:.10f}".format(acc_char, acc_image, cost_))
+
+                    # with open("loss_train.csv", "a+") as f:
+                    #     f.write("{},{},{},{}\n".format(step, acc_char, acc_image, cost_))
+
                     # 基于验证集的测试
                     batch_x_verify, batch_y_verify = self.get_verify_batch(size=100)
                     acc_char = sess.run(accuracy_char_count, feed_dict={self.X: batch_x_verify, self.Y: batch_y_verify, self.keep_prob: 1.})
                     acc_image = sess.run(accuracy_image_count, feed_dict={self.X: batch_x_verify, self.Y: batch_y_verify, self.keep_prob: 1.})
                     print("[验证集] 字符准确率为 {:.5f} 图片准确率为 {:.5f} >>> loss {:.10f}".format(acc_char, acc_image, cost_))
+
+                    # with open("loss_test.csv", "a+") as f:
+                    #     f.write("{}, {},{},{}\n".format(step, acc_char, acc_image, cost_))
+
                     # 准确率达到99%后保存并停止
                     if acc_image > self.acc_stop:
                         saver.save(sess, self.model_save_dir)

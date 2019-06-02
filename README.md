@@ -31,9 +31,11 @@ use CNN recognize captcha by tensorflow.
 2. 优化代码结构
 3. 把通用配置抽取到`sample_config.json`和`captcha_config.json`
 4. 修复若干大家在issue提出的问题
-5. 更新`readme.md`
-6. TAG: v2.0  
-
+#### 2019.06.01
+1. 完善readme文档，文档不长，请大家一定要读完~
+2. 使用cnnlib目录存放神经网络结构代码
+3. 做了一版训练数据统计，大家可以参考我们的训练次数、时长和准确率
+4. TAG: v2.0  
 
 # 目录
 <a href="#项目介绍">1 项目介绍</a>  
@@ -49,14 +51,18 @@ use CNN recognize captcha by tensorflow.
 - <a href="#训练模型">2.4 训练模型</a>  
 - <a href="#批量验证">2.5 批量验证</a>  
 - <a href="#启动WebServer">2.6 启动WebServer</a>  
-- <a href="#调用接口">2.7 调用接口</a>  
+- <a href="#调用接口识别">2.7 调用接口识别</a>  
 - <a href="#部署">2.8 部署</a>  
-- <a href="#部署">2.9 部署多个模型</a>  
-- <a href="#部署">2.10 压力测试</a>  
+- <a href="#部署多个模型">2.9 部署多个模型</a>  
+- <a href="#在线识别">2.10 在线识别</a>  
 
-<a href="#说明">3 说明</a>  
+<a href="#说明">3 统计数据</a>  
+- <a href="#训练数据统计">3.1 训练数据统计</a>  
+- <a href="#压力测试">3.2 压力测试</a>  
 
-<a href="#已知BUG">4 已知BUG</a>  
+<a href="#开发说明">4 开发说明</a>  
+
+<a href="#已知BUG">5 已知BUG</a>  
 
 
 
@@ -115,6 +121,7 @@ use CNN recognize captcha by tensorflow.
 | 1 | `conf/` | 配置文件目录 |
 | 2 | `sample/` | 数据集目录 |
 | 3 | `model/` | 模型文件目录 |
+| 4 | `cnnlib/` | 封装CNN的相关代码目录 |
 ### 1.2.2 训练模型
 | 序号 | 文件名称 | 说明 |
 | ------ | ------ | ------ |
@@ -237,46 +244,31 @@ python3 verify_and_split_data.py
 程序会把无效的文件留在原文件夹。  
 
 此外，当你有新的样本需要一起训练，可以放在`sample/new`目录下，再次运行`python3 verify_and_split_data.py`即可。  
-需要注意的是，如果新的样本中有新增的标签，你需要把新的标签增加到`char_set`配置中或者`labels.json`文件中。  
+需要注意的是，如果新的样本中有新增的标签，你需要把新的标签增加到`char_set`配置中或者`labels.json`文件中。 
+ 
 ## 2.4 训练模型
 创建好训练集和测试集之后，就可以开始训练模型了。  
 训练的过程中会输出日志，日志展示当前的训练轮数、准确率和loss。  
 **此时的准确率是训练集图片的准确率，代表训练集的图片识别情况**  
 例如：
 ```
-第10次训练 >>> 准确率为 1.0 >>> loss 0.0019966468680649996
+第10次训练 >>> 
+[训练集] 字符准确率为 0.03000 图片准确率为 0.00000 >>> loss 0.1698757857
+[验证集] 字符准确率为 0.04000 图片准确率为 0.00000 >>> loss 0.1698757857
+```
+字符准确率和图片准确率的解释：
+```
+假设：有100张图片，每张图片四个字符，共400个字符。我们这里把任务拆分为为需要识别400个字符
+字符准确率：识别400的字符中，正确字符的占比。
+图片准确率：100张图片中，4个字符完全识别准确的图片占比。
 ```
 这里不具体介绍tensorflow安装相关问题，直奔主题。  
 确保图片相关参数和目录设置正确后，执行以下命令开始训练：
 ```
 python3 train_model.py
 ```
-也可以调用类开始训练或执行一次简单的识别演示
-```
-from train_model import TrainModel
-from sample import sample_conf
+也可以根据`train_model.py`的`main`函数中的代码调用类开始训练或执行一次简单的识别演示。  
 
-# 导入配置
-train_image_dir = sample_conf["train_image_dir"]
-char_set = sample_conf["char_set"]
-model_save_dir = sample_conf["model_save_dir"]
-
-# verify参数默认为False，当verify=True则会在训练前校验所有图片格式时候为指定的后缀
-tm = TrainModel(train_image_dir, char_set, model_save_dir, verify=False)
-
-tm.train_cnn()  # 执行训练
-
-tm.recognize_captcha()  # 识别演示
-
-```
-
-**2018.11.26** 新增`train_model_v2.py`文件  
-同样是训练模型的脚本，在训练过程中增加了识别测试集的并输出准确率的过程，例如：
-```
-第480次训练 >>> [训练集] 准确率为 1.0 >>> loss 0.0017373242881149054
-            >>> [验证集] 准确率为 0.9500000095367432 >>> loss 0.0017373242881149054
-验证集准确率达到99%，保存模型成功
-```
 由于训练集中常常不包含所有的样本特征，所以会出现训练集准确率是100%而测试集准确率不足100%的情况，此时提升准确率的一个解决方案是增加正确标记后的负样本。
 
 ## 2.5 批量验证
@@ -284,31 +276,17 @@ tm.recognize_captcha()  # 识别演示
 ```
 python3 test_batch.py
 ```
-也可以调用类进行验证
-```
-from test_batch import TestBatch
-from sample import sample_conf
-
-# 导入配置
-test_image_dir = sample_conf["test_image_dir"]
-model_save_dir = sample_conf["model_save_dir"]
-char_set = sample_conf["char_set"]
-total = 100  # 验证的图片总量
-
-tb = TestBatch(test_image_dir, char_set, model_save_dir, total)
-tb.test_batch()  # 开始验证
-
-```
+同样可以根据`main`函数中的代码调用类开始验证。
 
 ## 2.6 启动WebServer
-项目已经封装好加载模型和识别图片的类，启动web server后调用接口就可以使用识别服务。  
-启动web server
+项目已经封装好加载模型和识别图片的类，启动`web server`后调用接口就可以使用识别服务。  
+启动`web server`
 ```
-python3 recognize_api.py
+python3 webserver_recognize_api.py
 ```
 接口url为`http://127.0.0.1:6000/b`
 
-## 2.7 调用接口
+## 2.7 调用接口识别
 使用requests调用接口:
 ```
 url = "http://127.0.0.1:6000/b"
@@ -322,10 +300,11 @@ r = requests.post(url=url, files=files)
     'value': 'jsp1',
 }
 ```
-文件`recognize_online.py`是使用接口在线识别的例子
+文件`recognize_local.py`是使用接口识别本地的例子，这个例子运行成功，那么识别验证码的一套流程基本上是走了一遍了。  
+在线识别验证码是显示中常用场景，文件`recognize_online.py`是使用接口在线识别的例子，参见：`## 2.11 在线识别`。
 
 ## 2.8 部署
-部署的时候，把`recognize_api.py`文件的最后一行修改为如下内容：
+部署的时候，把`webserver_recognize_api.py`文件的最后一行修改为如下内容：
 ```
 app.run(host='0.0.0.0',port=5000,debug=False)
 ```
@@ -335,7 +314,7 @@ app.run(host='0.0.0.0',port=5000,debug=False)
 
 ## 2.9 部署多个模型
 部署多个模型:
-在`recognize_api.py`文件汇总，新建一个Recognizer对象；  
+在`webserver_recognize_api.py`文件汇总，新建一个Recognizer对象；  
 并参照原有`up_image`函数编写的路由和识别逻辑。
 ```
 Q = Recognizer(image_height, image_width, max_captcha, char_set, model_save_dir)
@@ -345,7 +324,45 @@ Q = Recognizer(image_height, image_width, max_captcha, char_set, model_save_dir)
 value = Q.rec_image(img)
 ```
 
-## 2.10 压力测试和统计数据
+## 2.10 在线识别
+在线识别验证码是显示中常用场景，即实时获取目标验证码来调用接口进行识别。  
+为了测试的完整性，这里搭建了一个验证码获取接口，通过执行下面的命令启动：  
+```
+python webserver_captcha_image.py
+```
+启动后通过访问此地址：`http://127.0.0.1:6100/captcha/`可以接收到验证码图片的二进制流文件。  
+具体进行在线识别任务的demo参见：`recognize_online.py`。  
+
+# 3 数据统计
+## 3.1 训练数据统计
+由于很多同学提出，“需要训练多久呀？”、“准确率可以达到多少？”、“为什么我的准确率一直是0？”类似的疑问。  
+这一小节，使用默认配置（2019.06.02），把训练过程中的数据做了统计，给大家做一个展示。  
+本次测试条件如下：
+- 验证码：本项目自带生成验证码程序，数字+小写英文
+- 数量：20000张
+- 计算引擎：GPU
+- GPU型号：笔记本，GTX 950X 2G显卡
+  
+经过测试：
+5000次，25分钟，**训练集**字符准确率84%，图片准确率51%；  
+9190次，46分钟，**训练集**字符准确率100%，图片准确率100%；  
+12000，60分钟，**测试集**的准确率基本上已经跑不动了。  
+
+使用`test_batch.py`测试，日志如下：  
+```
+100个样本识别耗时6.513171672821045秒，准确率37.0%
+```
+有37%的准确率，可以说是识别成功的第一步了。  
+
+曲线图如下：  
+训练集-  
+![train_acc](readme_image/train_acc.png) 
+   
+测试集-   
+![test_acc](readme_image/test_acc.png)  
+
+
+## 3.2 压力测试和统计数据
 提供了一个简易的压力测试脚本，可以统计api运行过程中识别耗时和请求耗时的相关数据，不过图需要自己用Excel拉出来。  
 打开文件`recognize_time_test.py`，修改`main`函数下的`test_file`路径，这里会重复使用一张图片来访问是被接口。  
 最后数据会储存在test.csv文件中。  
@@ -365,8 +382,13 @@ python3 recognize_time_test.py
 - 每次请求耗时（平均值）：15ms  
 其中有：请求API总耗时 = 识别耗时 + 请求耗时  
 
-# 3 说明
-1. 目前没有保存用于tensorboard的日志文件
+# 4 开发说明
+- 20190209  
+1. 目前tensorboard展示支持的不是很好。
+- 20190601
+1. 最近比较忙，issue回的有点慢，请大家见谅
+2. dev分支开发到一半一直没时间弄，今天儿童节花了一下午时间更新了一下:)
+3. 感谢看到这里的你，谢谢你的支持
 
 # 4 已知BUG
 1. 使用pycharm启动recognize_api.py文件报错
