@@ -111,3 +111,7 @@ sample/
 model/
 labels.json
 test.csv
+loss_test.csv
+loss_train.csv
+
+logs/
