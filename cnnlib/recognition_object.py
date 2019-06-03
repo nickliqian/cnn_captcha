@@ -7,10 +7,12 @@ for i in range(10):
     t = R.rec_image(r_img)
 简单的图片每张基本上可以达到毫秒级的识别速度
 """
+import json
+
 import tensorflow as tf
 import numpy as np
 from PIL import Image
-from conf.sample import sample_conf
+# from conf.sample import sample_conf
 from cnnlib.network import CNN
 
 
@@ -61,6 +63,9 @@ class Recognizer(CNN):
 
 
 def main():
+    with open("../conf/sample_config.json", "r") as f:
+        sample_conf = json.load(f)
+
     image_height = sample_conf["image_height"]
     image_width = sample_conf["image_width"]
     max_captcha = sample_conf["max_captcha"]
