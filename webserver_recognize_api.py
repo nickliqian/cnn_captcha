@@ -44,6 +44,7 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 # 生成识别对象，需要配置参数
 R = Recognizer(image_height, image_width, max_captcha, char_set, model_save_dir)
 
+
 # 如果你需要使用多个模型，可以参照原有的例子配置路由和编写逻辑
 # Q = Recognizer(image_height, image_width, max_captcha, char_set, model_save_dir)
 
@@ -71,10 +72,14 @@ def up_image():
         # 保存图片
         print("保存图片： {}{}_{}.{}".format(api_image_dir, value, timec, image_suffix))
         file_name = "{}_{}.{}".format(value, timec, image_suffix)
-        file_path = os.path.join(api_image_dir + file_name)
+
+        localpath = os.getcwd()
+        if not os.path.exists(localpath + '/' + api_image_dir):
+            os.makedirs(localpath + '/' + api_image_dir)
+        file_path = os.path.join(localpath + '/' + api_image_dir + file_name)
         img.save(file_path)
         result = {
-            'time': timec,   # 时间戳
+            'time': timec,  # 时间戳
             'value': value,  # 预测的结果
             'speed_time(ms)': int((e - s) * 1000)  # 识别耗费的时间
         }
