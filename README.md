@@ -163,7 +163,7 @@ pip install -r requirements.txt
 为了便于处理，图片最好以`2e8j_17322d3d4226f0b5c5a71d797d2ba7f7.jpg`格式命名（标签_序列号.后缀）。 
   
 如果你没有训练集，你可以使用`gen_sample_by_captcha.py`文件生成训练集文件。
-生成之前你需要修改相关配置`conf/sample_config.json`（路径、文件后缀、字符集等）。
+生成之前你需要修改相关配置`conf/captcha_config.json`（路径、文件后缀、字符集等）。
 ```
 {
   "root_dir": "sample/origin/",  # 验证码保存路径
