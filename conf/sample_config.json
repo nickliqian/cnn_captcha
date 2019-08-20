@@ -17,5 +17,7 @@
   "cycle_stop": 20000,
   "acc_stop": 0.99,
   "cycle_save": 500,
-  "enable_gpu": 1
+  "enable_gpu": 1,
+  "train_batch_size": 128,
+  "test_batch_size": 100
 }

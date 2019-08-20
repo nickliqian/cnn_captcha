@@ -16,11 +16,14 @@ class TrainError(Exception):
 
 
 class TrainModel(CNN):
-    def __init__(self, train_img_path, verify_img_path, char_set, model_save_dir, cycle_stop, acc_stop, cycle_save, image_suffix, verify=False):
+    def __init__(self, train_img_path, verify_img_path, char_set, model_save_dir, cycle_stop, acc_stop, cycle_save,
+                 image_suffix, train_batch_size, test_batch_size, verify=False):
         # 训练相关参数
         self.cycle_stop = cycle_stop
         self.acc_stop = acc_stop
         self.cycle_save = cycle_save
+        self.train_batch_size = train_batch_size
+        self.test_batch_size = test_batch_size
 
         self.image_suffix = image_suffix
         char_set = [str(i) for i in char_set]
@@ -168,13 +171,13 @@ class TrainModel(CNN):
 
             step = 1
             for i in range(self.cycle_stop):
-                batch_x, batch_y = self.get_batch(i, size=128)
+                batch_x, batch_y = self.get_batch(i, size=self.train_batch_size)
                 # 梯度下降训练
                 _, cost_ = sess.run([optimizer, cost],
                                     feed_dict={self.X: batch_x, self.Y: batch_y, self.keep_prob: 0.75})
                 if step % 10 == 0:
                     # 基于训练集的测试
-                    batch_x_test, batch_y_test = self.get_batch(i, size=100)
+                    batch_x_test, batch_y_test = self.get_batch(i, size=self.train_batch_size)
                     acc_char = sess.run(accuracy_char_count, feed_dict={self.X: batch_x_test, self.Y: batch_y_test, self.keep_prob: 1.})
                     acc_image = sess.run(accuracy_image_count, feed_dict={self.X: batch_x_test, self.Y: batch_y_test, self.keep_prob: 1.})
                     print("第{}次训练 >>> ".format(step))
@@ -184,7 +187,7 @@ class TrainModel(CNN):
                     #     f.write("{},{},{},{}\n".format(step, acc_char, acc_image, cost_))
 
                     # 基于验证集的测试
-                    batch_x_verify, batch_y_verify = self.get_verify_batch(size=100)
+                    batch_x_verify, batch_y_verify = self.get_verify_batch(size=self.test_batch_size)
                     acc_char = sess.run(accuracy_char_count, feed_dict={self.X: batch_x_verify, self.Y: batch_y_verify, self.keep_prob: 1.})
                     acc_image = sess.run(accuracy_image_count, feed_dict={self.X: batch_x_verify, self.Y: batch_y_verify, self.keep_prob: 1.})
                     print("[验证集] 字符准确率为 {:.5f} 图片准确率为 {:.5f} >>> loss {:.10f}".format(acc_char, acc_image, cost_))
@@ -247,6 +250,8 @@ def main():
     enable_gpu = sample_conf["enable_gpu"]
     image_suffix = sample_conf['image_suffix']
     use_labels_json_file = sample_conf['use_labels_json_file']
+    train_batch_size = sample_conf['train_batch_size']
+    test_batch_size = sample_conf['test_batch_size']
 
     if use_labels_json_file:
         with open("tools/labels.json", "r") as f:
@@ -259,7 +264,8 @@ def main():
         os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
         os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
-    tm = TrainModel(train_image_dir, verify_image_dir, char_set, model_save_dir, cycle_stop, acc_stop, cycle_save, image_suffix, verify=False)
+    tm = TrainModel(train_image_dir, verify_image_dir, char_set, model_save_dir, cycle_stop, acc_stop, cycle_save,
+                    image_suffix, train_batch_size, test_batch_size, verify=False)
     tm.train_cnn()  # 开始训练模型
     # tm.recognize_captcha()  # 识别图片示例
 

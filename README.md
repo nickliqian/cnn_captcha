@@ -198,7 +198,9 @@ pip install -r requirements.txt
   "cycle_stop": 3000,                                  # 启动任务后的训练指定次数后停止
   "acc_stop": 0.99,                                    # 训练到指定准确率后停止
   "cycle_save": 500,                                   # 训练指定次数后定时保存模型
-  "enable_gpu": 0                                      # 是否开启GUP训练
+  "enable_gpu": 0,                                     # 是否开启GUP训练
+  "train_batch_size": 128,                             # 训练时每次使用的图片张数，如果CPU或者GPU内存太小可以减少这个参数
+  "test_batch_size": 100                               # 每批次测试时验证的图片张数，不要超过验证码集的总数
 }
 
 ```
@@ -416,3 +418,10 @@ tensorflow.python.framework.errors_impl.InvalidArgumentError: Unsuccessful Tenso
 
 5. Flask程序用于生产
 可以参考官方文档：[Flask的生产配置](http://docs.jinkan.org/docs/flask/config.html)
+
+6. OOM happens
+```
+Hint: If you want to see a list of allocated tensors when OOM happens,
+add report_tensor_allocations_upon_oom to RunOptions for current allocation info.
+```
+尽可能关闭其他占用GPU或者CPU的任务，或者减小`sample_config.json`中的`train_batch_size`参数。
