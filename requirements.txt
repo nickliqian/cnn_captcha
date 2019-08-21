@@ -30,4 +30,4 @@ tensorboard==1.7.0
 tensorflow==1.7.0
 termcolor==1.1.0
 urllib3==1.23
-Werkzeug==0.15.2
+Werkzeug==0.15.3
