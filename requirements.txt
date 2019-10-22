@@ -19,7 +19,7 @@ MarkupSafe==1.1.1
 matplotlib==2.1.0
 numpy==1.16.2
 olefile==0.46
-Pillow==4.3.0
+Pillow==6.2.0
 protobuf==3.6.0
 pyparsing==2.4.0
 python-dateutil==2.8.0
