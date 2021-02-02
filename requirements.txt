@@ -1,6 +1,6 @@
 absl-py==0.7.1
 astor==0.7.1
-bleach==1.5.0
+bleach==3.3.0
 captcha==0.3
 certifi==2019.3.9
 chardet==3.0.4
