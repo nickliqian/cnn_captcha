@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import json
-
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 import numpy as np
 import matplotlib.pyplot as plt
 import time
@@ -10,6 +9,7 @@ import random
 import os
 from cnnlib.network import CNN
 
+tf.disable_v2_behavior()
 
 class TrainError(Exception):
     pass

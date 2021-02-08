@@ -1,9 +1,10 @@
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 import numpy as np
 import os
 from PIL import Image
 import random
 
+tf.disable_v2_behavior()
 
 class CNN(object):
     def __init__(self, image_height, image_width, max_captcha, char_set, model_save_dir):
@@ -60,7 +61,7 @@ class CNN(object):
 
         # 卷积层1
         wc1 = tf.get_variable(name='wc1', shape=[3, 3, 1, 32], dtype=tf.float32,
-                              initializer=tf.contrib.layers.xavier_initializer())
+                              initializer=tf.keras.initializers.glorot_normal())
         bc1 = tf.Variable(self.b_alpha * tf.random_normal([32]))
         conv1 = tf.nn.relu(tf.nn.bias_add(tf.nn.conv2d(x, wc1, strides=[1, 1, 1, 1], padding='SAME'), bc1))
         conv1 = tf.nn.max_pool(conv1, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
@@ -68,7 +69,7 @@ class CNN(object):
 
         # 卷积层2
         wc2 = tf.get_variable(name='wc2', shape=[3, 3, 32, 64], dtype=tf.float32,
-                              initializer=tf.contrib.layers.xavier_initializer())
+                              initializer=tf.keras.initializers.glorot_normal())
         bc2 = tf.Variable(self.b_alpha * tf.random_normal([64]))
         conv2 = tf.nn.relu(tf.nn.bias_add(tf.nn.conv2d(conv1, wc2, strides=[1, 1, 1, 1], padding='SAME'), bc2))
         conv2 = tf.nn.max_pool(conv2, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
@@ -76,7 +77,7 @@ class CNN(object):
 
         # 卷积层3
         wc3 = tf.get_variable(name='wc3', shape=[3, 3, 64, 128], dtype=tf.float32,
-                              initializer=tf.contrib.layers.xavier_initializer())
+                              initializer=tf.keras.initializers.glorot_normal())
         bc3 = tf.Variable(self.b_alpha * tf.random_normal([128]))
         conv3 = tf.nn.relu(tf.nn.bias_add(tf.nn.conv2d(conv2, wc3, strides=[1, 1, 1, 1], padding='SAME'), bc3))
         conv3 = tf.nn.max_pool(conv3, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
@@ -86,7 +87,7 @@ class CNN(object):
 
         # 全连接层1
         wd1 = tf.get_variable(name='wd1', shape=[next_shape, 1024], dtype=tf.float32,
-                              initializer=tf.contrib.layers.xavier_initializer())
+                              initializer=tf.keras.initializers.glorot_normal())
         bd1 = tf.Variable(self.b_alpha * tf.random_normal([1024]))
         dense = tf.reshape(conv3, [-1, wd1.get_shape().as_list()[0]])
         dense = tf.nn.relu(tf.add(tf.matmul(dense, wd1), bd1))
@@ -94,7 +95,7 @@ class CNN(object):
 
         # 全连接层2
         wout = tf.get_variable('name', shape=[1024, self.max_captcha * self.char_set_len], dtype=tf.float32,
-                               initializer=tf.contrib.layers.xavier_initializer())
+                               initializer=tf.keras.initializers.glorot_normal())
         bout = tf.Variable(self.b_alpha * tf.random_normal([self.max_captcha * self.char_set_len]))
 
         with tf.name_scope('y_prediction'):
