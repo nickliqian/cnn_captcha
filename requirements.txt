@@ -13,7 +13,7 @@ grpcio==1.19.0
 html5lib==0.9999999
 idna==2.7
 itsdangerous==1.1.0
-Jinja2==2.10.1
+Jinja2==2.11.3
 Markdown==3.1
 MarkupSafe==1.1.1
 matplotlib==2.1.0
