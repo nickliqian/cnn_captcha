@@ -10,7 +10,7 @@ easydict==1.8
 Flask==1.0.2
 gast==0.2.2
 grpcio==1.19.0
-html5lib==0.9999999
+html5lib==0.99999999
 idna==2.7
 itsdangerous==1.1.0
 Jinja2==2.10.1
